@@ -96,6 +96,36 @@ describe('FilterPanel', () => {
     expect(message?.textContent).toContain('minimum not above the maximum');
   });
 
+  it('keeps what the user is typing when another filter changes the URL', async () => {
+    const { fixture, range } = await setup();
+    const [, max] = Array.from(range('Price').querySelectorAll('input'));
+    type(max as HTMLInputElement, '200'); // typed, not committed yet
+
+    // The URL changes because another filter was committed.
+    fixture.componentRef.setInput('view', {
+      ...DEFAULT_VIEW,
+      ranges: { peRatio: { max: 15 } },
+    });
+    await fixture.whenStable();
+    expect((max as HTMLInputElement).value).toBe('200');
+
+    // Committing the other bound of the same filter lands in the URL while Max is being typed.
+    fixture.componentRef.setInput('view', {
+      ...DEFAULT_VIEW,
+      ranges: { price: { min: 1 } },
+    });
+    await fixture.whenStable();
+    expect((max as HTMLInputElement).value).toBe('200');
+
+    // When the bound itself changes in the URL, the draft follows the URL.
+    fixture.componentRef.setInput('view', {
+      ...DEFAULT_VIEW,
+      ranges: { price: { min: 1, max: 50 } },
+    });
+    await fixture.whenStable();
+    expect((max as HTMLInputElement).value).toBe('50');
+  });
+
   it('clears a range when both inputs are emptied', async () => {
     const view = { ...DEFAULT_VIEW, ranges: { price: { min: 10 } } };
     const { range, changes } = await setup(view);
