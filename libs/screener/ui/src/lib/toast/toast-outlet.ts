@@ -6,6 +6,8 @@ import {
   inject,
   InjectionToken,
   input,
+  type Signal,
+  signal,
 } from '@angular/core';
 
 import { Button } from '../button/button';
@@ -19,11 +21,17 @@ export interface ToastLabels {
   readonly region: string;
 }
 
-/** Translated labels for every toast outlet (the app's and those inside dialogs). */
-export const TOAST_LABELS = new InjectionToken<ToastLabels>('TOAST_LABELS', {
-  providedIn: 'root',
-  factory: () => ({ dismiss: 'Dismiss', region: 'Notifications' }),
-});
+/**
+ * Translated labels for every toast outlet (the app's and those inside dialogs). A signal, so
+ * outlets follow a runtime language switch; the app provides one fed by its translations.
+ */
+export const TOAST_LABELS = new InjectionToken<Signal<ToastLabels>>(
+  'TOAST_LABELS',
+  {
+    providedIn: 'root',
+    factory: () => signal({ dismiss: 'Dismiss', region: 'Notifications' }),
+  },
+);
 
 /**
  * Renders the toast queue.
