@@ -61,7 +61,7 @@ describe('WatchlistPage', () => {
 
   it('lists watched instruments in order, linking each to the screener', async () => {
     const { root } = await setup();
-    expect(root.querySelector('h1')?.textContent).toBe('Watchlist');
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('Watchlist');
     expect(root.querySelector('caption')?.textContent?.trim()).toBe(
       '3 watched instruments',
     );

@@ -1,22 +1,29 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import {
+  LocaleState,
   MarketDataStore,
   type WatchlistEvent,
   type WatchlistOperation,
   WatchlistStore,
 } from '@data-heavy/data-access';
 import { ToastService } from '@data-heavy/ui';
+import { pluralCategory } from '@data-heavy/util';
+import { TranslateService } from '@ngx-translate/core';
 
 /**
  * Turns watchlist store events into toasts: Undo after a change, Retry after a failure, and
  * feedback for offline changes. Lives in one place so every feature that changes the watchlist
  * (drawer, watchlist page) behaves the same without depending on each other.
+ *
+ * Messages are translated when the event happens (toasts are short-lived).
  */
 @Injectable({ providedIn: 'root' })
 export class WatchlistNotifications {
   private readonly store = inject(WatchlistStore);
   private readonly market = inject(MarketDataStore);
   private readonly toasts = inject(ToastService);
+  private readonly translate = inject(TranslateService);
+  private readonly locale = inject(LocaleState).locale;
   private readonly destroyRef = inject(DestroyRef);
   private started = false;
 
@@ -38,44 +45,64 @@ export class WatchlistNotifications {
         const { operation, undo } = event;
         this.toasts.show({
           kind: 'success',
-          message:
+          message: this.t(
             operation.kind === 'add'
-              ? `Added ${this.symbol(operation)} to your watchlist.`
-              : `Removed ${this.symbol(operation)} from your watchlist.`,
-          action: { label: 'Undo', run: () => this.store.apply(undo) },
+              ? 'notifications.added'
+              : 'notifications.removed',
+            { symbol: this.symbol(operation) },
+          ),
+          action: {
+            label: this.t('notifications.undo'),
+            run: () => this.store.apply(undo),
+          },
         });
         break;
       }
       case 'failed': {
         const { operation, retryable } = event;
-        const verb = operation.kind === 'add' ? 'add' : 'remove';
         this.toasts.show({
           kind: 'error',
-          message: `Couldn't ${verb} ${this.symbol(operation)}. Your change was undone.`,
+          message: this.t(
+            operation.kind === 'add'
+              ? 'notifications.failedAdd'
+              : 'notifications.failedRemove',
+            { symbol: this.symbol(operation) },
+          ),
           action: retryable
-            ? { label: 'Retry', run: () => this.store.apply(operation) }
+            ? {
+                label: this.t('notifications.retry'),
+                run: () => this.store.apply(operation),
+              }
             : undefined,
         });
         break;
       }
       case 'queued': {
         const { operation } = event;
-        const verb = operation.kind === 'add' ? 'added to' : 'removed from';
         this.toasts.show({
-          message: `You're offline. ${this.symbol(operation)} will be ${verb} your watchlist when you reconnect.`,
+          message: this.t(
+            operation.kind === 'add'
+              ? 'notifications.queuedAdd'
+              : 'notifications.queuedRemove',
+            { symbol: this.symbol(operation) },
+          ),
         });
         break;
       }
       case 'synced':
         this.toasts.show({
           kind: 'success',
-          message:
-            event.count === 1
-              ? 'Back online: 1 watchlist change saved.'
-              : `Back online: ${event.count} watchlist changes saved.`,
+          message: this.t(
+            `notifications.synced.${pluralCategory(event.count, this.locale())}`,
+            { count: event.count },
+          ),
         });
         break;
     }
+  }
+
+  private t(key: string, params?: Record<string, unknown>): string {
+    return this.translate.instant(key, params) as string;
   }
 
   private symbol(operation: WatchlistOperation): string {

@@ -7,9 +7,18 @@ import {
   inject,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MarketDataStore, WatchlistStore } from '@data-heavy/data-access';
+import {
+  LocaleState,
+  MarketDataStore,
+  WatchlistStore,
+} from '@data-heavy/data-access';
 import { Button, Skeleton } from '@data-heavy/ui';
-import { getFormatters, type Instrument } from '@data-heavy/util';
+import {
+  getFormatters,
+  type Instrument,
+  pluralCategory,
+} from '@data-heavy/util';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { WatchlistNotifications } from '../notifications/watchlist-notifications';
 
@@ -28,7 +37,7 @@ interface Row {
  */
 @Component({
   selector: 'dh-watchlist-page',
-  imports: [Button, RouterLink, Skeleton],
+  imports: [Button, RouterLink, Skeleton, TranslatePipe],
   templateUrl: './watchlist-page.html',
   styleUrl: './watchlist-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,7 +48,8 @@ export class WatchlistPage {
   private readonly host =
     inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
 
-  protected readonly locale = 'en-US';
+  private readonly translate = inject(TranslateService);
+  protected readonly locale = inject(LocaleState).locale;
   protected readonly skeletonRows = [1, 2, 3];
 
   protected readonly status = computed(() => {
@@ -52,7 +62,7 @@ export class WatchlistPage {
   });
 
   protected readonly rows = computed<readonly Row[]>(() => {
-    const f = getFormatters(this.locale);
+    const f = getFormatters(this.locale());
     const byId = this.market.byId();
     return this.store
       .ids()
@@ -68,12 +78,13 @@ export class WatchlistPage {
       }));
   });
 
-  protected readonly queuedMessage = computed(() => {
-    const count = this.store.queuedCount();
-    return count === 1
-      ? "1 change will be saved when you're back online."
-      : `${count} changes will be saved when you're back online.`;
-  });
+  protected readonly queuedMessage = computed(() =>
+    this.plural('watchlist.queued', this.store.queuedCount()),
+  );
+
+  protected readonly caption = computed(() =>
+    this.plural('watchlist.caption', this.rows().length),
+  );
 
   private focusAfterRemove: number | null = null;
 
@@ -99,6 +110,17 @@ export class WatchlistPage {
   protected remove(index: number, id: string): void {
     this.focusAfterRemove = index;
     this.store.remove(id);
+  }
+
+  /** Picks the CLDR plural form (`.one`, `.other`) for the current locale. */
+  private plural(key: string, count: number): string {
+    this.translate.currentLang();
+    return this.translate.instant(
+      `${key}.${pluralCategory(count, this.locale())}`,
+      {
+        count,
+      },
+    ) as string;
   }
 
   protected retry(): void {
