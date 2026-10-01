@@ -10,15 +10,20 @@ export default defineConfig(() => ({
   test: {
     name: 'data-access',
     watch: false,
-    passWithNoTests: true,
     globals: true,
     environment: 'jsdom',
-    include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    include: ['src/**/*.spec.ts'],
     setupFiles: ['src/test-setup.ts'],
     reporters: ['default'],
     coverage: {
+      enabled: true,
       reportsDirectory: '../../../coverage/libs/screener/data-access',
       provider: 'v8' as const,
+      include: ['src/lib/**/*.ts'],
+      exclude: ['src/**/*.spec.ts'],
+      reporter: ['text-summary', 'lcov'],
+      // Adapters are the boundary to "the backend": failure paths must be tested.
+      thresholds: { lines: 95, functions: 95, branches: 90, statements: 95 },
     },
   },
 }));
