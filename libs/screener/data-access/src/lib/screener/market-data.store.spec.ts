@@ -4,7 +4,7 @@ import { generateInstruments } from '@data-heavy/util';
 
 import { MarketDataError } from '../market-data-error';
 import { type MarketData, MarketDataPort } from '../market-data.port';
-import { MarketDataStore } from './market-data.store';
+import { MARKET_DATA_LOAD_START, MarketDataStore } from './market-data.store';
 
 const instruments = generateInstruments(6, 10);
 
@@ -26,7 +26,14 @@ function setup(...outcomes: (MarketData | Error)[]) {
   const port = new FakePort();
   port.outcomes = outcomes;
   TestBed.configureTestingModule({
-    providers: [{ provide: MarketDataPort, useValue: port }],
+    providers: [
+      // No rendering in these tests: start loading immediately.
+      {
+        provide: MARKET_DATA_LOAD_START,
+        useValue: (start: () => void) => start(),
+      },
+      { provide: MarketDataPort, useValue: port },
+    ],
   });
   return TestBed.inject(MarketDataStore);
 }

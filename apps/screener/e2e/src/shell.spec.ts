@@ -4,14 +4,21 @@ import { expect, test } from '@playwright/test';
 test.describe('app shell', () => {
   test('has a title, a main landmark and a working skip link', async ({
     page,
+    browserName,
   }) => {
     await page.goto('/');
 
     await expect(page).toHaveTitle('Market Screener');
     await expect(page.getByRole('main')).toBeAttached();
 
-    await page.keyboard.press('Tab');
     const skipLink = page.getByRole('link', { name: 'Skip to main content' });
+    if (browserName === 'webkit') {
+      // Safari only tabs to links with a user setting (or Option+Tab, which Playwright's WebKit
+      // build does not honour on every platform), so focus it directly there.
+      await skipLink.focus();
+    } else {
+      await page.keyboard.press('Tab');
+    }
     await expect(skipLink).toBeFocused();
 
     await page.keyboard.press('Enter');

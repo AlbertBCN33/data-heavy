@@ -49,6 +49,7 @@
             [attr.aria-describedby]="isInvalid ? errorId(key) : null"
             (input)="onRangeInput(key, 'min', $any($event.target).value)"
             (change)="commitRange(key)"
+            (keydown.enter)="commitRange(key)"
           />
         </label>
         <label>
@@ -64,6 +65,7 @@
             [attr.aria-describedby]="isInvalid ? errorId(key) : null"
             (input)="onRangeInput(key, 'max', $any($event.target).value)"
             (change)="commitRange(key)"
+            (keydown.enter)="commitRange(key)"
           />
         </label>
       </div>

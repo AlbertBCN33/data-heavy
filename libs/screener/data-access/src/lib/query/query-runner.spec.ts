@@ -6,11 +6,8 @@ import {
   type QueryRequest,
   type QueryResponse,
 } from './query-protocol';
-import {
-  QUERY_WORKER_FACTORY,
-  QueryRunner,
-  type QueryWorker,
-} from './query-runner';
+import { QueryRunner } from './query-runner';
+import { QUERY_WORKER_FACTORY, type QueryWorker } from './query-worker-factory';
 
 const rows = generateInstruments(4, 40);
 const query = (text = ''): ScreenerQuery => ({

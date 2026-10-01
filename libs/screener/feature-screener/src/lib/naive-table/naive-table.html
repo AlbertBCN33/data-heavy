@@ -1,0 +1,29 @@
+<div class="dh-naive">
+  <table class="dh-naive__table">
+    <caption class="dh-naive__caption">
+      {{
+        label()
+      }}
+    </caption>
+    <thead>
+      <tr>
+        @for (column of defs(); track column.key) {
+          <th scope="col">
+            <button type="button" (click)="onSort(column.key, $event)">
+              {{ columnLabelKey(column.key) | translate }}
+            </button>
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track $index) {
+        <tr (click)="rowActivate.emit(row.id)">
+          @for (column of defs(); track column.key) {
+            <td>{{ cellText(column, row) }}</td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

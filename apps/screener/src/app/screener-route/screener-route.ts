@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -37,11 +38,14 @@ export class ScreenerRoute {
     const injector = inject(Injector);
     let destroyed = false;
     inject(DestroyRef).onDestroy(() => (destroyed = true));
-    void import('@data-heavy/feature-watchlist').then((m) => {
-      // The route may be gone by the time the chunk arrives (fast navigation).
-      if (!destroyed) {
-        injector.get(m.WatchlistNotifications).start();
-      }
+    // Not needed to paint the page: loaded after the first render.
+    afterNextRender(() => {
+      void import('@data-heavy/feature-watchlist').then((m) => {
+        // The route may be gone by the time the chunk arrives (fast navigation).
+        if (!destroyed) {
+          injector.get(m.WatchlistNotifications).start();
+        }
+      });
     });
   }
 }

@@ -20,7 +20,11 @@
       ],
       "outputs": ["{projectRoot}/public/data"],
       "options": {
-        "command": "tsx --tsconfig tools/market-data/tsconfig.json tools/market-data/generate.ts --out apps/screener/public/data/market-snapshot.json"
+        "commands": [
+          "tsx --tsconfig tools/market-data/tsconfig.json tools/market-data/generate.ts --out apps/screener/public/data/market-snapshot.json",
+          "tsx --tsconfig tools/market-data/tsconfig.json tools/market-data/generate.ts --count 50000 --out apps/screener/public/data/market-snapshot-50k.json"
+        ],
+        "parallel": true
       }
     },
     "build": {
@@ -51,8 +55,8 @@
           "budgets": [
             {
               "type": "initial",
-              "maximumWarning": "500kb",
-              "maximumError": "1mb"
+              "maximumWarning": "560kb",
+              "maximumError": "600kb"
             },
             {
               "type": "anyComponentStyle",

@@ -55,6 +55,8 @@ work across languages.
 
 - One build serves every language. The cost is 5.5 kB on the initial bundle (98.5 kB transferred)
   and one small JSON request before first render (cached by the service worker afterwards).
+  _Update ([ADR 0015](0015-performance-budgets-and-quality-gates.md)): that request sat on the LCP
+  critical path, so English is now bundled and only other languages are fetched._
 - Translations are not type-checked at compile time. The parity test and the "real English in unit
   tests" setup catch missing keys before production.
 - Adding a language is a JSON file plus an entry in `LANGUAGES`. The parity test then enforces

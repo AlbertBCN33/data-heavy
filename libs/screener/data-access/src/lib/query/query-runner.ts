@@ -1,10 +1,4 @@
-import {
-  DestroyRef,
-  inject,
-  Injectable,
-  InjectionToken,
-  signal,
-} from '@angular/core';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import type { Instrument, ScreenerQuery } from '@data-heavy/util';
 
 import {
@@ -12,27 +6,7 @@ import {
   type QueryRequest,
   type QueryResponse,
 } from './query-protocol';
-
-/** The subset of `Worker` the runner uses; lets tests provide a fake. */
-export interface QueryWorker {
-  postMessage(message: QueryRequest): void;
-  terminate(): void;
-  onmessage: ((event: MessageEvent<QueryResponse>) => void) | null;
-  onerror: ((event: Event) => void) | null;
-}
-
-/** Creates the worker, or returns `null` where workers are unavailable (SSR, tests). */
-export const QUERY_WORKER_FACTORY = new InjectionToken<
-  () => QueryWorker | null
->('QUERY_WORKER_FACTORY', {
-  providedIn: 'root',
-  factory: () => () =>
-    typeof Worker === 'undefined'
-      ? null
-      : (new Worker(new URL('./query.worker', import.meta.url), {
-          type: 'module',
-        }) as unknown as QueryWorker),
-});
+import { QUERY_WORKER_FACTORY, type QueryWorker } from './query-worker-factory';
 
 export interface QueryResult {
   /** The dataset the indexes refer to; use it to resolve rows, never a newer one. */

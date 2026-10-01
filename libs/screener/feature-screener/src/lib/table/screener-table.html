@@ -29,7 +29,7 @@
             [attr.tabindex]="isActive(headerRow, c) ? 0 : -1"
             [attr.data-row]="headerRow"
             [attr.data-col]="c"
-            (click)="onHeaderActivate(column.key, c, $event.shiftKey)"
+            (click)="onHeaderClick($event, column.key, c)"
           >
             <span>{{ columnLabelKey(column.key) | translate }}</span>
             @if (state) {

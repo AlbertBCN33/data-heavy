@@ -16,7 +16,9 @@
     "e2e": "nx e2e e2e-screener",
     "format": "nx format:write --all",
     "format:check": "nx format:check --all",
-    "data:generate": "nx run screener:market-data"
+    "data:generate": "nx run screener:market-data",
+    "lighthouse": "lhci autorun",
+    "perf:measure": "node tools/perf/measure.mjs"
   },
   "dependencies": {
     "@angular/aria": "22.2.1",
@@ -29,7 +31,6 @@
     "@angular/router": "22.2.1",
     "@angular/service-worker": "22.2.1",
     "@ngx-translate/core": "18.0.0",
-    "@ngx-translate/http-loader": "18.0.0",
     "rxjs": "7.8.2"
   },
   "devDependencies": {
@@ -43,6 +44,7 @@
     "@angular/language-service": "22.2.1",
     "@axe-core/playwright": "4.13.0",
     "@eslint/js": "9.39.5",
+    "@lhci/cli": "0.15.1",
     "@nx/angular": "23.2.1",
     "@nx/devkit": "23.2.1",
     "@nx/eslint": "23.2.1",

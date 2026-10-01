@@ -97,21 +97,34 @@ export class FilterPanel {
     return Object.fromEntries(entries) as Record<EnumColumnKey, SelectOption[]>;
   });
 
-  /** Raw input text per range filter, in the user's number format; reset when the URL changes. */
-  protected readonly drafts = linkedSignal(() => {
-    const ranges = this.view().ranges;
-    const locale = this.locale();
-    const entries = RANGE_FILTERS.map((key): [NumberColumnKey, RangeDraft] => {
-      const range = ranges[key];
-      return [
-        key,
-        {
-          min: formatNumberInput(range?.min, locale),
-          max: formatNumberInput(range?.max, locale),
-        },
-      ];
-    });
-    return Object.fromEntries(entries) as Record<NumberColumnKey, RangeDraft>;
+  /**
+   * Raw input text per range bound, in the user's number format. A bound's draft is reset only when
+   * that bound changes in the URL (or the locale changes): committing Min, another filter or a
+   * search update must not wipe what the user is typing in Max, even if the URL lands mid-typing.
+   */
+  protected readonly drafts = linkedSignal<
+    { ranges: ScreenerView['ranges']; locale: string },
+    Record<NumberColumnKey, RangeDraft>
+  >({
+    source: () => ({ ranges: this.view().ranges, locale: this.locale() }),
+    computation: ({ ranges, locale }, previous) => {
+      const sameLocale = previous?.source.locale === locale;
+      const bound = (key: NumberColumnKey, side: keyof RangeDraft): string => {
+        const value = ranges[key]?.[side];
+        return previous &&
+          sameLocale &&
+          previous.source.ranges[key]?.[side] === value
+          ? previous.value[key][side]
+          : formatNumberInput(value, locale);
+      };
+      const entries = RANGE_FILTERS.map(
+        (key): [NumberColumnKey, RangeDraft] => [
+          key,
+          { min: bound(key, 'min'), max: bound(key, 'max') },
+        ],
+      );
+      return Object.fromEntries(entries) as Record<NumberColumnKey, RangeDraft>;
+    },
   });
 
   protected readonly invalid = signal<ReadonlySet<NumberColumnKey>>(new Set());
@@ -149,7 +162,10 @@ export class FilterPanel {
     }));
   }
 
-  /** Commits on `change` (blur or Enter) so partial input never reaches the URL. */
+  /**
+   * Commits on `change` (blur) and on Enter, so partial input never reaches the URL. Enter is
+   * handled explicitly because Safari does not reliably fire `change` for it.
+   */
   protected commitRange(key: NumberColumnKey): void {
     const locale = this.locale();
     const min = normalizeNumberInput(this.drafts()[key].min, locale);

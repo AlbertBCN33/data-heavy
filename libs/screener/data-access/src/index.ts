@@ -7,6 +7,7 @@ export * from './lib/market-data.port';
 export * from './lib/network/network-status';
 export * from './lib/provide-market-data';
 export * from './lib/query/query-runner';
+export * from './lib/query/query-worker-factory';
 export * from './lib/screener/market-data.store';
 export * from './lib/screener/screener-url-state';
 export * from './lib/screener/screener.store';

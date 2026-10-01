@@ -4,7 +4,8 @@ import { provideRouter, Router } from '@angular/router';
 import { generateInstruments } from '@data-heavy/util';
 
 import { type MarketData, MarketDataPort } from '../market-data.port';
-import { QUERY_WORKER_FACTORY } from '../query/query-runner';
+import { QUERY_WORKER_FACTORY } from '../query/query-worker-factory';
+import { MARKET_DATA_LOAD_START } from './market-data.store';
 import { provideScreenerStore, ScreenerStore } from './screener.store';
 
 const instruments = generateInstruments(8, 60);
@@ -22,6 +23,11 @@ class FakePort extends MarketDataPort {
 async function setup(url = '/') {
   TestBed.configureTestingModule({
     providers: [
+      // No rendering in these tests: start loading immediately.
+      {
+        provide: MARKET_DATA_LOAD_START,
+        useValue: (start: () => void) => start(),
+      },
       provideRouter([]),
       provideScreenerStore(),
       { provide: MarketDataPort, useClass: FakePort },

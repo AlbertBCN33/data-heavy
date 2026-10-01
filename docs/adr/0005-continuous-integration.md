@@ -20,6 +20,9 @@ to `main`:
    so a red `main` does not hide breakage.
 3. `nx affected -t e2e` against the **production build** served statically, with axe checks
    inside the specs. Playwright browsers are only installed when an e2e project is affected.
+4. Lighthouse CI on the production build when the app is affected. The browser matrix (Chromium and
+   a mobile profile on pull requests, plus Firefox and WebKit on `main`) and the Lighthouse thresholds
+   are in [ADR 0015](0015-performance-budgets-and-quality-gates.md).
 
 Caching:
 
@@ -27,7 +30,7 @@ Caching:
 | ------------------- | -------------------------------------------------------------------------------- |
 | npm downloads       | `actions/setup-node` with `cache: npm`, keyed on `package-lock.json`             |
 | Nx task results     | `actions/cache` on `.nx/cache`, keyed on lockfile + commit, restoring the latest |
-| Playwright browsers | `actions/cache` keyed on the installed Playwright version                        |
+| Playwright browsers | `actions/cache` keyed on the Playwright version and the browsers installed       |
 
 Hardening:
 
