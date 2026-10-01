@@ -5,7 +5,7 @@ export const appRoutes: Route[] = [
     path: '',
     title: 'Market Screener',
     loadComponent: () =>
-      import('@data-heavy/feature-screener').then((m) => m.ScreenerPage),
+      import('./screener-route/screener-route').then((m) => m.ScreenerRoute),
   },
   { path: '**', redirectTo: '' },
 ];
