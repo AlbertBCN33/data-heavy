@@ -43,6 +43,7 @@ export const TOAST_LABELS = new InjectionToken<ToastLabels>('TOAST_LABELS', {
   templateUrl: './toast-outlet.html',
   styleUrl: './toast-outlet.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '[class.dh-toasts-host--modal]': 'scope() === "modal"' },
 })
 export class ToastOutlet {
   readonly scope = input<'page' | 'modal'>('page');
