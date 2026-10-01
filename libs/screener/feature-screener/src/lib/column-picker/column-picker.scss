@@ -1,0 +1,49 @@
+.dh-columns__hint {
+  margin: 0 0 1rem;
+  color: var(--dh-text-muted);
+}
+
+.dh-columns__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dh-columns__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-block-size: 2.75rem;
+  border-block-end: 1px solid var(--dh-border);
+}
+
+.dh-columns__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: 2.75rem;
+  flex: 1;
+  cursor: pointer;
+
+  input {
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+  }
+}
+
+.dh-columns__moves {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.dh-columns__footer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-block-start: 1px solid var(--dh-border);
+}
+
+.dh-columns__spacer {
+  flex: 1;
+}
