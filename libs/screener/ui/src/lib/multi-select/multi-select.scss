@@ -1,0 +1,108 @@
+:host {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-inline-size: 10rem;
+}
+
+.dh-multi-select__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.dh-multi-select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-block-size: 2.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--dh-control-border, #8a919c);
+  border-radius: 0.375rem;
+  background: var(--dh-bg, #fff);
+  cursor: pointer;
+
+  &[aria-expanded='true'] .dh-multi-select__chevron {
+    transform: rotate(180deg);
+  }
+}
+
+.dh-multi-select__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dh-multi-select__value--placeholder {
+  color: var(--dh-text-muted, #545b66);
+}
+
+.dh-multi-select__chevron {
+  inline-size: 0;
+  block-size: 0;
+  border-inline: 0.3rem solid transparent;
+  border-block-start: 0.35rem solid currentColor;
+}
+
+.dh-multi-select__popup {
+  margin-block-start: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--dh-border, #d5d9e0);
+  border-radius: 0.375rem;
+  background: var(--dh-bg, #fff);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 15%);
+}
+
+.dh-multi-select__listbox {
+  max-block-size: 16rem;
+  overflow: auto;
+}
+
+.dh-multi-select__option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: 2.25rem;
+  padding: 0 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+
+  // Active descendant: focus stays on the trigger, so the option needs its own visible indicator.
+  &[data-active='true'] {
+    outline: 2px solid var(--dh-focus, #1a5fd0);
+    outline-offset: -2px;
+  }
+
+  &:hover {
+    background: var(--dh-surface, #f5f6f8);
+  }
+}
+
+.dh-multi-select__check {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1rem;
+  block-size: 1rem;
+  border: 1.5px solid var(--dh-text-muted, #545b66);
+  border-radius: 0.2rem;
+}
+
+[aria-selected='true'] > .dh-multi-select__check {
+  border-color: var(--dh-accent, #1a5fd0);
+  background: var(--dh-accent, #1a5fd0);
+
+  &::after {
+    content: '';
+    inline-size: 0.3rem;
+    block-size: 0.55rem;
+    border: solid var(--dh-on-accent, #fff);
+    border-width: 0 2px 2px 0;
+    transform: translateY(-1px) rotate(45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dh-multi-select__chevron {
+    transition: none;
+  }
+}
