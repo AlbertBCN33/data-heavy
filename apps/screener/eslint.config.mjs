@@ -6,6 +6,10 @@ export default [
   ...nx.configs['flat/angular-template'],
   ...baseConfig,
   {
+    // Nested e2e-screener project is linted with its own (Playwright) config.
+    ignores: ['e2e/**'],
+  },
+  {
     files: ['**/*.ts'],
     rules: {
       '@angular-eslint/directive-selector': [

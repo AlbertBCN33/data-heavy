@@ -13,16 +13,16 @@ be tested in isolation.
 
 One deployable app and focused, non-buildable libraries, all generated with Nx generators:
 
-| Project             | Tag                | Responsibility                                          |
-| ------------------- | ------------------ | ------------------------------------------------------- |
-| `screener`          | `type:app`         | Shell, routing, layout, i18n wiring. Composes features  |
-| `e2e-screener`      | `type:e2e`         | Playwright journeys for `screener`                      |
-| `feature-screener`  | `type:feature`     | Table, filter panel, column picker                      |
-| `feature-detail`    | `type:feature`     | Instrument detail drawer and chart                      |
-| `feature-watchlist` | `type:feature`     | Watchlist with optimistic updates                       |
-| `data-access`       | `type:data-access` | `MarketDataPort`, adapters, caching, signal-based state |
-| `ui`                | `type:ui`          | Accessible presentational components                    |
-| `util`              | `type:util`        | Pure helpers: formatting, filter/sort engine, URL codec |
+| Project             | Tag                | Responsibility                                             |
+| ------------------- | ------------------ | ---------------------------------------------------------- |
+| `screener`          | `type:app`         | Shell, routing, layout, i18n wiring. Composes features     |
+| `e2e-screener`      | `type:e2e`         | Playwright journeys for `screener`, in `apps/screener/e2e` |
+| `feature-screener`  | `type:feature`     | Table, filter panel, column picker                         |
+| `feature-detail`    | `type:feature`     | Instrument detail drawer and chart                         |
+| `feature-watchlist` | `type:feature`     | Watchlist with optimistic updates                          |
+| `data-access`       | `type:data-access` | `MarketDataPort`, adapters, caching, signal-based state    |
+| `ui`                | `type:ui`          | Accessible presentational components                       |
+| `util`              | `type:util`        | Pure helpers: formatting, filter/sort engine, URL codec    |
 
 Dependency rules, enforced by `@nx/enforce-module-boundaries` in `eslint.config.mjs`:
 
@@ -47,3 +47,11 @@ app ──► feature ──► data-access ──► util
 - `nx affected` skips work for untouched libraries.
 - More files (`project.json`, configs) than a single-project app would need. That cost is
   accepted because the structure is part of what the project demonstrates.
+
+## Location of end-to-end tests
+
+The e2e project lives inside the app it tests (`apps/screener/e2e`) rather than as a sibling under
+`apps/`. Ownership is obvious from the path, and adding a second app later brings its own `e2e`
+folder with it. It stays a separate Nx project (`e2e-screener`, tag `type:e2e`) with its own
+Playwright ESLint config. The app's ESLint config ignores `e2e/**`, and Nx assigns files to the
+innermost project, so a change to an e2e spec does not invalidate the app's cached build or tests.
