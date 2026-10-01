@@ -28,8 +28,14 @@ export abstract class MarketDataPort {
   /** Ids of watched instruments, in the order they were added. */
   abstract getWatchlist(signal?: AbortSignal): Promise<readonly string[]>;
 
-  /** Idempotent: adding an instrument that is already watched succeeds. */
-  abstract addToWatchlist(instrumentId: string): Promise<void>;
+  /**
+   * Idempotent: adding an instrument that is already watched succeeds. `position` inserts at an
+   * index (used by Undo to restore an item where it was); by default the item is appended.
+   */
+  abstract addToWatchlist(
+    instrumentId: string,
+    position?: number,
+  ): Promise<void>;
 
   /** Idempotent: removing an instrument that is not watched succeeds. */
   abstract removeFromWatchlist(instrumentId: string): Promise<void>;
