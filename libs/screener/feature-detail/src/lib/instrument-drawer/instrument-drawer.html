@@ -6,6 +6,20 @@
   (openChange)="onOpenChange($event)"
 >
   @if (instrument(); as i) {
+    <div class="dh-detail__actions">
+      <!-- The label states the action, so no aria-pressed (it would contradict the label). -->
+      <button
+        dhButton
+        type="button"
+        [variant]="watched() ? 'secondary' : 'primary'"
+        [disabled]="watchlist.status() !== 'ready'"
+        (click)="watchlist.toggle(i.id)"
+      >
+        <span aria-hidden="true">{{ watched() ? '★' : '☆' }}</span>
+        {{ watched() ? 'Remove from watchlist' : 'Add to watchlist' }}
+      </button>
+    </div>
+
     <dl class="dh-detail__stats">
       @for (stat of stats(); track stat.label) {
         <div class="dh-detail__stat">

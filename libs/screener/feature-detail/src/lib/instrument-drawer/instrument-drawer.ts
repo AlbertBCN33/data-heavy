@@ -11,6 +11,7 @@ import {
   MarketDataPort,
   MarketDataStore,
   ScreenerUrlState,
+  WatchlistStore,
 } from '@data-heavy/data-access';
 import { Button, Dialog, Skeleton } from '@data-heavy/ui';
 import { getFormatters, type Instrument } from '@data-heavy/util';
@@ -49,6 +50,7 @@ export class InstrumentDrawer {
   private readonly url = inject(ScreenerUrlState);
   private readonly market = inject(MarketDataStore);
   private readonly port = inject(MarketDataPort);
+  protected readonly watchlist = inject(WatchlistStore);
 
   protected readonly locale = 'en-US';
   protected readonly ranges = CHART_RANGES;
@@ -129,6 +131,11 @@ export class InstrumentDrawer {
       date: f.date(p.date),
       close: f.price(p.close, i.currency),
     }));
+  });
+
+  protected readonly watched = computed(() => {
+    const i = this.instrument();
+    return !!i && this.watchlist.idSet().has(i.id);
   });
 
   protected onOpenChange(open: boolean): void {
