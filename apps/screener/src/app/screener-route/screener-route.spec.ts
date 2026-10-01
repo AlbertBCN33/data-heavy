@@ -36,11 +36,12 @@ describe('ScreenerRoute', () => {
     expect(root.querySelector('dh-screener-page')).not.toBeNull();
   });
 
-  it('only renders the detail drawer once something is selected', async () => {
+  it('does not render the detail drawer without a selection', async () => {
     expect((await setup('/')).querySelector('dh-instrument-drawer')).toBeNull();
-    TestBed.resetTestingModule();
-    expect(
-      (await setup('/?sel=NYSE:ABC')).querySelector('dh-instrument-drawer'),
-    ).not.toBeNull();
+  });
+
+  it('renders the detail drawer once something is selected', async () => {
+    const root = await setup('/?sel=NYSE:ABC');
+    expect(root.querySelector('dh-instrument-drawer')).not.toBeNull();
   });
 });

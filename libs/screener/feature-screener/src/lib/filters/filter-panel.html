@@ -1,16 +1,18 @@
 <form
   class="dh-filters"
   role="search"
-  aria-label="Filter instruments"
+  [attr.aria-label]="'filters.landmark' | translate"
   (submit)="$event.preventDefault()"
 >
   <div class="dh-filters__field">
-    <label class="dh-filters__label" [for]="idPrefix + '-q'">Search</label>
+    <label class="dh-filters__label" [for]="idPrefix + '-q'">{{
+      'filters.search' | translate
+    }}</label>
     <input
       class="dh-filters__input"
       type="search"
       autocomplete="off"
-      placeholder="Symbol or name"
+      [placeholder]="'filters.searchPlaceholder' | translate"
       [id]="idPrefix + '-q'"
       [value]="text()"
       (input)="onSearchInput($any($event.target).value)"
@@ -19,8 +21,8 @@
 
   @for (key of enumFilters; track key) {
     <dh-multi-select
-      [label]="labels[key]"
-      placeholder="Any"
+      [label]="columnLabelKey(key) | translate"
+      [placeholder]="'filters.any' | translate"
       [options]="options()[key]"
       [value]="view().selects[key] ?? []"
       (valueChange)="onSelect(key, $event)"
@@ -30,10 +32,14 @@
   @for (key of rangeFilters; track key) {
     @let isInvalid = invalid().has(key);
     <fieldset class="dh-filters__range">
-      <legend class="dh-filters__label">{{ labels[key] }}</legend>
+      <legend class="dh-filters__label">
+        {{ columnLabelKey(key) | translate }}
+      </legend>
       <div class="dh-filters__range-inputs">
         <label>
-          <span class="dh-filters__sublabel">Min</span>
+          <span class="dh-filters__sublabel">{{
+            'filters.min' | translate
+          }}</span>
           <input
             class="dh-filters__input"
             inputmode="decimal"
@@ -46,7 +52,9 @@
           />
         </label>
         <label>
-          <span class="dh-filters__sublabel">Max</span>
+          <span class="dh-filters__sublabel">{{
+            'filters.max' | translate
+          }}</span>
           <input
             class="dh-filters__input"
             inputmode="decimal"
@@ -61,14 +69,13 @@
       </div>
       @if (isInvalid) {
         <p class="dh-filters__error" [id]="errorId(key)">
-          Enter numbers such as 10, 2.5 or 2B, with the minimum not above the
-          maximum.
+          {{ 'filters.rangeError' | translate }}
         </p>
       }
     </fieldset>
   }
 
   <button dhButton type="button" (click)="clearAll.emit()">
-    Clear filters
+    {{ 'screener.clearFilters' | translate }}
   </button>
 </form>

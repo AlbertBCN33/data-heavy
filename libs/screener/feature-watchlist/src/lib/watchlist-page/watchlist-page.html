@@ -1,5 +1,7 @@
 <div class="dh-watchlist">
-  <h1 class="dh-watchlist__title" tabindex="-1">Watchlist</h1>
+  <h1 class="dh-watchlist__title" tabindex="-1">
+    {{ 'watchlist.heading' | translate }}
+  </h1>
 
   @if (store.queuedCount() > 0) {
     <p class="dh-watchlist__note" role="status">
@@ -10,9 +12,9 @@
   @switch (status()) {
     @case ('error') {
       <div class="dh-watchlist__message" role="alert">
-        <p>Your watchlist could not be loaded.</p>
+        <p>{{ 'watchlist.loadError' | translate }}</p>
         <button dhButton variant="primary" type="button" (click)="retry()">
-          Try again
+          {{ 'watchlist.retry' | translate }}
         </button>
       </div>
     }
@@ -26,27 +28,34 @@
     @default {
       @if (rows().length === 0) {
         <div class="dh-watchlist__message">
-          <p>Your watchlist is empty.</p>
+          <p>{{ 'watchlist.empty' | translate }}</p>
+          <p>{{ 'watchlist.emptyHint' | translate }}</p>
           <p>
-            Open an instrument in the <a routerLink="/">screener</a> and choose
-            “Add to watchlist”.
+            <a routerLink="/">{{ 'watchlist.openScreener' | translate }}</a>
           </p>
         </div>
       } @else {
         <table class="dh-watchlist__table">
           <caption class="dh-watchlist__caption">
             {{
-              rows().length
+              caption()
             }}
-            watched instruments
           </caption>
           <thead>
             <tr>
-              <th scope="col">Symbol</th>
-              <th scope="col">Name</th>
-              <th scope="col" class="dh-watchlist__num">Price</th>
-              <th scope="col" class="dh-watchlist__num">Change</th>
-              <th scope="col"><span class="dh-sr-only">Actions</span></th>
+              <th scope="col">{{ 'watchlist.symbol' | translate }}</th>
+              <th scope="col">{{ 'watchlist.name' | translate }}</th>
+              <th scope="col" class="dh-watchlist__num">
+                {{ 'watchlist.price' | translate }}
+              </th>
+              <th scope="col" class="dh-watchlist__num">
+                {{ 'watchlist.change' | translate }}
+              </th>
+              <th scope="col">
+                <span class="dh-sr-only">{{
+                  'watchlist.actions' | translate
+                }}</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -78,7 +87,7 @@
                     "
                     (click)="remove(i, row.id)"
                   >
-                    Remove
+                    {{ 'watchlist.remove' | translate }}
                   </button>
                 </td>
               </tr>

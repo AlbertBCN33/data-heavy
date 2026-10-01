@@ -17,7 +17,9 @@ import {
   PINNED_COLUMN,
 } from '@data-heavy/util';
 
-import { COLUMN_LABELS } from '../screener-labels';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+
+import { columnLabelKey } from '../screener-labels';
 
 export interface ColumnChoice {
   readonly key: ColumnKey;
@@ -46,7 +48,7 @@ let nextId = 0;
  */
 @Component({
   selector: 'dh-column-picker',
-  imports: [Button, Dialog],
+  imports: [Button, Dialog, TranslatePipe],
   templateUrl: './column-picker.html',
   styleUrl: './column-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,7 +58,8 @@ export class ColumnPicker {
   readonly columnsChange = output<ColumnKey[]>();
 
   protected readonly idPrefix = `dh-columns-${nextId++}`;
-  protected readonly labels = COLUMN_LABELS;
+  protected readonly columnLabelKey = columnLabelKey;
+  private readonly translate = inject(TranslateService);
   protected readonly pinned = PINNED_COLUMN;
   protected readonly open = signal(false);
   protected readonly draft = signal<ColumnChoice[]>([]);
@@ -114,7 +117,11 @@ export class ColumnPicker {
         : 'down';
     this.focusAfterRender = this.moveId(item.key, direction);
     void this.announcer.announce(
-      `${COLUMN_LABELS[item.key]} moved to position ${target + 1} of ${choices.length}`,
+      this.translate.instant('columnPicker.moved', {
+        label: this.translate.instant(columnLabelKey(item.key)),
+        position: target + 1,
+        total: choices.length,
+      }) as string,
     );
   }
 

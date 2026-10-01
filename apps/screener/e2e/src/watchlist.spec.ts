@@ -174,7 +174,9 @@ test.describe('watchlist', () => {
 });
 
 test.describe('offline app', () => {
-  // The service worker is only registered in production builds (CI serves one).
+  // The service worker is only registered in production builds (CI serves one). Conditional,
+  // not a forgotten skip.
+  // eslint-disable-next-line playwright/no-skipped-test
   test.skip(
     !process.env['CI'],
     'Needs the production build with its service worker',

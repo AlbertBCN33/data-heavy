@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { ModalStack } from '../modal/modal-stack';
@@ -9,7 +10,7 @@ async function setup() {
     providers: [
       {
         provide: TOAST_LABELS,
-        useValue: { dismiss: 'Cerrar', region: 'Notificaciones' },
+        useValue: signal({ dismiss: 'Cerrar', region: 'Notificaciones' }),
       },
     ],
   });

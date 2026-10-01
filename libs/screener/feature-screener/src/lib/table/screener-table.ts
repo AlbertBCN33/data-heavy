@@ -30,7 +30,9 @@ import {
   type SortSpec,
 } from '@data-heavy/util';
 
-import { COLUMN_LABELS, optionLabel } from '../screener-labels';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+
+import { columnLabelKey, optionLabel } from '../screener-labels';
 import {
   type CellPosition,
   clampPosition,
@@ -82,6 +84,7 @@ const SKELETON_ROWS = Array.from({ length: 12 }, (_, i) => i);
     CdkVirtualForOf,
     CdkVirtualScrollableElement,
     Skeleton,
+    TranslatePipe,
   ],
   templateUrl: './screener-table.html',
   styleUrl: './screener-table.scss',
@@ -106,7 +109,8 @@ export class ScreenerTable {
   protected readonly rowHeight = ROW_HEIGHT;
   protected readonly skeletonRows = SKELETON_ROWS;
   protected readonly headerRow = HEADER_ROW;
-  protected readonly labels = COLUMN_LABELS;
+  protected readonly columnLabelKey = columnLabelKey;
+  private readonly translate = inject(TranslateService);
 
   protected readonly defs = computed(() =>
     this.columns().map((key) => getColumn(key) as RegisteredColumn),
@@ -206,6 +210,7 @@ export class ScreenerTable {
         column.key as EnumColumnKey,
         value as string,
         this.locale(),
+        (key) => this.translate.instant(key) as string,
       );
     }
     return this.formatters().cell(column.format, value, row.currency);

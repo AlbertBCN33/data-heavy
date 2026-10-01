@@ -10,12 +10,23 @@ import {
   untracked,
 } from '@angular/core';
 import {
+  LocaleState,
   provideScreenerStore,
   ScreenerStore,
   WatchlistStore,
 } from '@data-heavy/data-access';
 import { Button, ToastService } from '@data-heavy/ui';
-import type { ColumnKey, SortSpec } from '@data-heavy/util';
+import {
+  type ColumnKey,
+  getFormatters,
+  pluralCategory,
+  type SortSpec,
+} from '@data-heavy/util';
+import {
+  translate,
+  TranslatePipe,
+  TranslateService,
+} from '@ngx-translate/core';
 
 import { ColumnPicker } from '../column-picker/column-picker';
 import { type FilterChange, FilterPanel } from '../filters/filter-panel';
@@ -30,7 +41,7 @@ const NARROW_SCREEN = '(max-width: 64rem)';
 
 @Component({
   selector: 'dh-screener-page',
-  imports: [Button, ColumnPicker, FilterPanel, ScreenerTable],
+  imports: [Button, ColumnPicker, FilterPanel, ScreenerTable, TranslatePipe],
   providers: [provideScreenerStore()],
   templateUrl: './screener-page.html',
   styleUrl: './screener-page.scss',
@@ -42,8 +53,8 @@ export class ScreenerPage {
   private readonly announcer = inject(LiveAnnouncer);
   private readonly toasts = inject(ToastService);
 
-  protected readonly locale = 'en-US';
-  private readonly numberFormat = new Intl.NumberFormat(this.locale);
+  private readonly translate = inject(TranslateService);
+  protected readonly locale = inject(LocaleState).locale;
 
   protected readonly state = computed<ScreenerState>(() => {
     if (this.store.status() === 'error') {
@@ -55,10 +66,13 @@ export class ScreenerPage {
     return this.store.rows().length === 0 ? 'empty' : 'ready';
   });
 
-  protected readonly countText = computed(() => {
-    const total = this.numberFormat.format(this.store.total());
-    const matches = this.numberFormat.format(this.store.rows().length);
-    return `${matches} of ${total} instruments`;
+  /** Localised count, e.g. "1,234 of 10,000 instruments" / "1.234 de 10.000 instrumentos". */
+  protected readonly countText = translate('screener.count', () => {
+    const format = getFormatters(this.locale());
+    return {
+      matches: format.integer(this.store.rows().length),
+      total: format.integer(this.store.total()),
+    };
   });
 
   protected readonly activeFilters = computed(() => {
@@ -68,6 +82,16 @@ export class ScreenerPage {
       Object.keys(ranges).length +
       Object.values(selects).filter((v) => v && v.length > 0).length
     );
+  });
+
+  /** "1 active" / "1 activo", "3 activos": plural form chosen for the current locale. */
+  protected readonly activeFiltersLabel = computed(() => {
+    const count = this.activeFilters();
+    this.translate.currentLang();
+    return this.translate.instant(
+      `filters.active.${pluralCategory(count, this.locale())}`,
+      { count },
+    ) as string;
   });
 
   protected readonly filtersOpen = signal(
@@ -106,7 +130,7 @@ export class ScreenerPage {
       if (this.state() === 'loading' || this.state() === 'error') {
         return;
       }
-      const message = this.countText();
+      const message = this.countText() as string;
       clearTimeout(timer);
       timer = setTimeout(() => {
         void this.announcer.announce(message, 'polite');
@@ -123,8 +147,9 @@ export class ScreenerPage {
         reported = true;
         untracked(() =>
           this.toasts.show({
-            message:
-              'Some settings in this link were not recognised and have been ignored.',
+            message: this.translate.instant(
+              'screener.ignoredSettings',
+            ) as string,
           }),
         );
       }

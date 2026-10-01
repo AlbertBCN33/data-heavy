@@ -1,0 +1,182 @@
+{
+  "app": {
+    "name": "Market Screener",
+    "skipToContent": "Skip to main content",
+    "navLabel": "Main",
+    "navScreener": "Screener",
+    "navWatchlist": "Watchlist",
+    "language": "Language",
+    "offline": "You're offline. Showing data saved on this device; watchlist changes will be saved when you reconnect.",
+    "updateAvailable": "A new version of the app is available.",
+    "reload": "Reload"
+  },
+  "titles": {
+    "screener": "Market Screener",
+    "watchlist": "Watchlist · Market Screener"
+  },
+  "toast": {
+    "dismiss": "Dismiss",
+    "region": "Notifications"
+  },
+  "columns": {
+    "symbol": "Symbol",
+    "name": "Name",
+    "type": "Type",
+    "exchange": "Exchange",
+    "sector": "Sector",
+    "country": "Country",
+    "price": "Price",
+    "changePct": "Change",
+    "volume": "Volume",
+    "marketCapUsd": "Market cap",
+    "peRatio": "P/E",
+    "dividendYield": "Div. yield",
+    "beta": "Beta",
+    "high52w": "52w high",
+    "low52w": "52w low"
+  },
+  "types": {
+    "equity": "Equity",
+    "etf": "ETF"
+  },
+  "sectors": {
+    "Communication": "Communication",
+    "ConsumerDiscretionary": "Consumer discretionary",
+    "ConsumerStaples": "Consumer staples",
+    "Energy": "Energy",
+    "Financials": "Financials",
+    "HealthCare": "Health care",
+    "Industrials": "Industrials",
+    "Materials": "Materials",
+    "RealEstate": "Real estate",
+    "Technology": "Technology",
+    "Utilities": "Utilities"
+  },
+  "screener": {
+    "heading": "Market screener",
+    "count": "{{matches}} of {{total}} instruments",
+    "updating": "Updating…",
+    "results": "Results",
+    "gridLabel": "Instruments",
+    "empty": "No instruments match these filters.",
+    "clearFilters": "Clear filters",
+    "loadError": "Market data could not be loaded.",
+    "retry": "Try again",
+    "ignoredSettings": "Some settings in this link were not recognised and have been ignored.",
+    "onWatchlist": ", on watchlist",
+    "sortPriority": ", sort {{priority}}, {{direction}}",
+    "ascending": "ascending",
+    "descending": "descending"
+  },
+  "filters": {
+    "heading": "Filters",
+    "active": {
+      "one": "{{count}} active",
+      "other": "{{count}} active"
+    },
+    "show": "Show",
+    "hide": "Hide",
+    "landmark": "Filter instruments",
+    "search": "Search",
+    "searchPlaceholder": "Symbol or name",
+    "any": "Any",
+    "min": "Min",
+    "max": "Max",
+    "rangeError": "Enter numbers such as 10, 2.5 or 2B, with the minimum not above the maximum."
+  },
+  "columnPicker": {
+    "button": "Columns",
+    "title": "Columns",
+    "hint": "Choose which columns to show and in which order. Symbol is always first.",
+    "moveUp": "Move {{label}} up",
+    "moveDown": "Move {{label}} down",
+    "moved": "{{label}} moved to position {{position}} of {{total}}",
+    "reset": "Reset to default",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "close": "Close"
+  },
+  "detail": {
+    "close": "Close details",
+    "loading": "Loading instrument",
+    "notFound": "Instrument not found",
+    "notFoundMessage": "This instrument is not available. The link may be outdated.",
+    "add": "Add to watchlist",
+    "remove": "Remove from watchlist",
+    "stats": {
+      "price": "Price",
+      "changeToday": "Change today",
+      "marketCap": "Market cap",
+      "volume": "Volume",
+      "peRatio": "P/E ratio",
+      "dividendYield": "Dividend yield",
+      "beta": "Beta",
+      "range52w": "52-week range",
+      "type": "Type",
+      "exchange": "Exchange",
+      "country": "Country",
+      "currency": "Currency"
+    },
+    "chart": {
+      "heading": "Price history",
+      "range": "Chart range",
+      "ranges": {
+        "1M": "1 month",
+        "3M": "3 months",
+        "6M": "6 months",
+        "1Y": "1 year"
+      },
+      "error": "Price history could not be loaded.",
+      "retry": "Try again",
+      "noData": "No price data.",
+      "up": "Up",
+      "down": "Down",
+      "flat": "Unchanged",
+      "summary": "{{direction}} {{change}}, from {{start}} on {{startDate}} to {{end}} on {{endDate}}. High {{high}} on {{highDate}}, low {{low}} on {{lowDate}}."
+    },
+    "table": {
+      "show": "Show price table",
+      "hide": "Hide price table",
+      "caption": "Daily closing prices, most recent first",
+      "date": "Date",
+      "close": "Close"
+    }
+  },
+  "watchlist": {
+    "heading": "Watchlist",
+    "caption": {
+      "one": "{{count}} watched instrument",
+      "other": "{{count}} watched instruments"
+    },
+    "symbol": "Symbol",
+    "name": "Name",
+    "price": "Price",
+    "change": "Change",
+    "actions": "Actions",
+    "remove": "Remove",
+    "removeLabel": "Remove {{symbol}} from watchlist",
+    "empty": "Your watchlist is empty.",
+    "emptyHint": "Open an instrument in the screener and choose “Add to watchlist”.",
+    "openScreener": "Go to the screener",
+    "loadError": "Your watchlist could not be loaded.",
+    "retry": "Try again",
+    "queued": {
+      "one": "{{count}} change will be saved when you're back online.",
+      "other": "{{count}} changes will be saved when you're back online."
+    }
+  },
+  "notifications": {
+    "added": "Added {{symbol}} to your watchlist.",
+    "removed": "Removed {{symbol}} from your watchlist.",
+    "failedAdd": "Couldn't add {{symbol}}. Your change was undone.",
+    "failedRemove": "Couldn't remove {{symbol}}. Your change was undone.",
+    "queuedAdd": "You're offline. {{symbol}} will be added to your watchlist when you reconnect.",
+    "queuedRemove": "You're offline. {{symbol}} will be removed from your watchlist when you reconnect.",
+    "synced": {
+      "one": "Back online: {{count}} watchlist change saved.",
+      "other": "Back online: {{count}} watchlist changes saved."
+    },
+    "undo": "Undo",
+    "retry": "Retry"
+  }
+}

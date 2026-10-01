@@ -62,7 +62,9 @@ async function setup(url = '/', outcome?: Error) {
 describe('ScreenerPage', () => {
   it('has a page heading and labelled regions', async () => {
     const { root } = await setup();
-    expect(root.querySelector('h1')?.textContent).toBe('Market screener');
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe(
+      'Market screener',
+    );
     expect(root.querySelector('aside')?.getAttribute('aria-labelledby')).toBe(
       'dh-filters-heading',
     );

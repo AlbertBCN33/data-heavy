@@ -18,3 +18,4 @@ One decision per file. Superseded ADRs are kept and marked, never rewritten.
 | [0011](0011-url-as-the-source-of-truth.md)               | The URL is the source of truth for the screener view | Accepted |
 | [0012](0012-price-chart-as-hand-rolled-svg.md)           | Price chart as a small hand-rolled SVG               | Accepted |
 | [0013](0013-optimistic-watchlist-and-offline-support.md) | Optimistic watchlist and offline support             | Accepted |
+| [0014](0014-runtime-i18n-with-ngx-translate.md)          | Runtime i18n with @ngx-translate                     | Accepted |

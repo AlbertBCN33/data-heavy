@@ -13,14 +13,18 @@ import { Button, MultiSelect, type SelectOption } from '@data-heavy/ui';
 import {
   type EnumColumn,
   type EnumColumnKey,
+  formatNumberInput,
   getColumn,
+  normalizeNumberInput,
   type NumberColumnKey,
   parseRange,
   type RangeFilter,
   type ScreenerView,
 } from '@data-heavy/util';
 
-import { COLUMN_LABELS, optionLabel } from '../screener-labels';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+
+import { columnLabelKey, optionLabel } from '../screener-labels';
 
 export interface FilterChange {
   readonly patch: Partial<ScreenerView>;
@@ -58,7 +62,7 @@ let nextId = 0;
  */
 @Component({
   selector: 'dh-filter-panel',
-  imports: [Button, MultiSelect],
+  imports: [Button, MultiSelect, TranslatePipe],
   templateUrl: './filter-panel.html',
   styleUrl: './filter-panel.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,7 +75,8 @@ export class FilterPanel {
   readonly clearAll = output<void>();
 
   protected readonly idPrefix = `dh-filters-${nextId++}`;
-  protected readonly labels = COLUMN_LABELS;
+  protected readonly columnLabelKey = columnLabelKey;
+  private readonly translate = inject(TranslateService);
   protected readonly enumFilters = ENUM_FILTERS;
   protected readonly rangeFilters = RANGE_FILTERS;
 
@@ -80,22 +85,31 @@ export class FilterPanel {
 
   protected readonly options = computed(() => {
     const locale = this.locale();
+    this.translate.currentLang(); // re-translate option labels on a language switch
+    const t = (key: string) => this.translate.instant(key) as string;
     const entries = ENUM_FILTERS.map((key): [EnumColumnKey, SelectOption[]] => [
       key,
       (getColumn(key) as EnumColumn).options.map((value) => ({
         value,
-        label: optionLabel(key, value, locale),
+        label: optionLabel(key, value, locale, t),
       })),
     ]);
     return Object.fromEntries(entries) as Record<EnumColumnKey, SelectOption[]>;
   });
 
-  /** Raw input text per range filter, reset whenever the URL changes. */
+  /** Raw input text per range filter, in the user's number format; reset when the URL changes. */
   protected readonly drafts = linkedSignal(() => {
     const ranges = this.view().ranges;
+    const locale = this.locale();
     const entries = RANGE_FILTERS.map((key): [NumberColumnKey, RangeDraft] => {
       const range = ranges[key];
-      return [key, { min: bound(range?.min), max: bound(range?.max) }];
+      return [
+        key,
+        {
+          min: formatNumberInput(range?.min, locale),
+          max: formatNumberInput(range?.max, locale),
+        },
+      ];
     });
     return Object.fromEntries(entries) as Record<NumberColumnKey, RangeDraft>;
   });
@@ -137,8 +151,10 @@ export class FilterPanel {
 
   /** Commits on `change` (blur or Enter) so partial input never reaches the URL. */
   protected commitRange(key: NumberColumnKey): void {
-    const { min, max } = this.drafts()[key];
-    const empty = min.trim() === '' && max.trim() === '';
+    const locale = this.locale();
+    const min = normalizeNumberInput(this.drafts()[key].min, locale);
+    const max = normalizeNumberInput(this.drafts()[key].max, locale);
+    const empty = min === '' && max === '';
     const range: RangeFilter | null = empty
       ? null
       : parseRange(`${min}..${max}`);
@@ -167,8 +183,4 @@ export class FilterPanel {
   protected errorId(key: NumberColumnKey): string {
     return `${this.idPrefix}-${key}-error`;
   }
-}
-
-function bound(value: number | undefined): string {
-  return value === undefined ? '' : String(value);
 }

@@ -1,4 +1,4 @@
-<section class="dh-toasts" [attr.aria-label]="labels.region">
+<section class="dh-toasts" [attr.aria-label]="labels().region">
   <ol class="dh-toasts__list" aria-live="assertive" aria-relevant="additions">
     @for (toast of assertive(); track toast.id) {
       <ng-container *ngTemplateOutlet="item; context: { $implicit: toast }" />
@@ -38,7 +38,7 @@
       variant="ghost"
       type="button"
       class="dh-toast__dismiss"
-      [attr.aria-label]="labels.dismiss"
+      [attr.aria-label]="labels().dismiss"
       (click)="service.dismiss(toast.id)"
     >
       <span aria-hidden="true">✕</span>
