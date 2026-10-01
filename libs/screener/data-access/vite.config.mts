@@ -20,7 +20,8 @@ export default defineConfig(() => ({
       reportsDirectory: '../../../coverage/libs/screener/data-access',
       provider: 'v8' as const,
       include: ['src/lib/**/*.ts'],
-      exclude: ['src/**/*.spec.ts'],
+      // Worker entry files only wire the tested handler to the worker scope.
+      exclude: ['src/**/*.spec.ts', 'src/**/*.worker.ts'],
       reporter: ['text-summary', 'lcov'],
       // Adapters are the boundary to "the backend": failure paths must be tested.
       thresholds: { lines: 95, functions: 95, branches: 90, statements: 95 },
