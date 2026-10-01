@@ -1,0 +1,16 @@
+{
+  "name": "market-data-tool",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "tools/market-data",
+  "tags": ["type:tool"],
+  "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "tsc -p tsconfig.json --noEmit"
+      }
+    }
+  }
+}

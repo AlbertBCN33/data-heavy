@@ -6,6 +6,23 @@
   "sourceRoot": "apps/screener/src",
   "tags": ["type:app", "scope:screener"],
   "targets": {
+    "market-data": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/tools/market-data/**/*",
+        "{workspaceRoot}/libs/screener/util/src/lib/market/**/*",
+        "{workspaceRoot}/libs/screener/util/src/lib/random/**/*",
+        "!{workspaceRoot}/libs/screener/util/src/**/*.spec.ts",
+        {
+          "externalDependencies": ["tsx"]
+        }
+      ],
+      "outputs": ["{projectRoot}/public/data"],
+      "options": {
+        "command": "tsx --tsconfig tools/market-data/tsconfig.json tools/market-data/generate.ts --out apps/screener/public/data/market-snapshot.json"
+      }
+    },
     "build": {
       "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
@@ -44,7 +61,8 @@
           "extractLicenses": false,
           "sourceMap": true
         }
-      }
+      },
+      "dependsOn": ["market-data"]
     },
     "serve": {
       "continuous": true,
@@ -57,7 +75,8 @@
         "development": {
           "buildTarget": "screener:build:development"
         }
-      }
+      },
+      "dependsOn": ["market-data"]
     },
     "lint": {
       "inputs": [
