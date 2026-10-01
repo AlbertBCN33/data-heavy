@@ -20,9 +20,11 @@ truth and the bugs that come with them (loops, partial syncs, stale state after 
 - **History.** Filter, sort and column changes push an entry, so Back undoes them. Typing in the
   search box replaces the current entry (debounced), so Back does not replay keystrokes. Column
   reordering is applied once from a dialog, not once per move.
-- **Graceful degradation.** Decoding never throws. Each invalid param (unknown column, bad range,
-  unknown value) is dropped on its own, the rest of the view is kept, and the user is told once
-  that some settings in the link were ignored.
+- **Graceful degradation.** Decoding never throws. Each invalid value of a screener param (bad
+  range, unknown sector, unknown sort column) is dropped on its own, the rest of the view is kept,
+  and the user is told once that some settings in the link were ignored. Params the screener does
+  not own (`utm_source`, `fbclid`, `lang`) and empty values (`sel=`) are ignored silently. Real links
+  carry tracking params, and warning about them would be noise.
 - **Coexistence.** Params owned by other features (`lang`, `sim`, `rows`) are preserved on every
   write and ignored by the codec.
 - **Equality.** The view signal only changes when the encoded view changes, and the query sent
