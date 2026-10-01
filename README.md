@@ -27,6 +27,8 @@ npm start            # http://localhost:4200
 | `npm run e2e`           | Playwright journeys with axe checks                                |
 | `npm run format:check`  | Prettier check                                                     |
 | `npm run data:generate` | Regenerate the market data snapshot (also runs before build/serve) |
+| `npm run lighthouse`    | Lighthouse CI against the production build (build first)           |
+| `npm run perf:measure`  | Before/after performance measurements (build first)                |
 
 ## Data
 
@@ -34,7 +36,12 @@ The app runs on a **synthetic, deterministic** dataset of 10,000 equities and ET
 figures are generated and do not refer to real companies. See [tools/market-data](tools/market-data/README.md)
 and [ADR 0006](docs/adr/0006-market-data-snapshot-and-adapters.md).
 
+Add `?rows=50000` to load a 50,000-row stress dataset, and `?naive=1` to compare with a naive
+implementation (every row in the DOM, filtering and sorting on the main thread). See
+[docs/performance.md](docs/performance.md).
+
 ## Documentation
 
 - [Architecture decision records](docs/adr/README.md)
+- [Performance: targets, measurements and budgets](docs/performance.md)
 - [Deployment](docs/deployment.md)

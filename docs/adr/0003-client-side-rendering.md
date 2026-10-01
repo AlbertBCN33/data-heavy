@@ -28,3 +28,7 @@ loaded in parallel with the code.
   by Lighthouse CI.
 - Prerendering the shell is still possible later without architectural changes, provided
   browser-only APIs (Worker, IndexedDB, `navigator.onLine`) stay behind injectable services.
+- _Update ([ADR 0015](0015-performance-budgets-and-quality-gates.md)): measurement changed two
+  details. The landing route is eager, because a lazy chunk only lengthened the critical chain.
+  The data now loads after the first contentful paint rather than in parallel with the code,
+  so it does not compete with the first paint on slow connections._
