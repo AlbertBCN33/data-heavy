@@ -9,3 +9,4 @@ One decision per file. Superseded ADRs are kept and marked, never rewritten.
 | [0002](0002-stack-and-pinned-versions.md)          | Stack and pinned versions                 | Accepted |
 | [0003](0003-client-side-rendering.md)              | Client-side rendering instead of SSR      | Accepted |
 | [0004](0004-workspace-structure-and-boundaries.md) | Workspace structure and module boundaries | Accepted |
+| [0005](0005-continuous-integration.md)             | Continuous integration                    | Accepted |
