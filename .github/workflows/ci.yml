@@ -24,7 +24,8 @@ env:
 jobs:
   ci:
     name: ci
-    runs-on: ubuntu-latest
+    # Pinned image: Playwright system deps are distro-specific; upgrade deliberately.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Checkout
