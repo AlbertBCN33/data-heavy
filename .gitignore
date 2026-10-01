@@ -45,3 +45,15 @@ Thumbs.db
 .claude/settings.local.json
 
 .angular
+
+vitest.config.*.timestamp*
+# local environment
+.env
+.env.*
+!.env.example
+
+# Playwright
+/test-results
+/playwright-report
+/blob-report
+/apps/*/test-output
