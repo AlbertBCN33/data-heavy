@@ -162,8 +162,9 @@ function makeInstrument(
 
   const changePct = round(clamp(random.normal(0.05, 2.1), -25, 25), 2);
   const shares = marketCapUsd / (price / fx);
-  const volume = Math.round(
+  const volume = significant(
     shares * clamp(Math.exp(random.normal(Math.log(0.004), 0.8)), 0.0002, 0.08),
+    3,
   );
 
   const beta = round(
@@ -200,7 +201,9 @@ function makeInstrument(
     price,
     changePct,
     volume,
-    marketCapUsd: Math.round(marketCapUsd),
+    // Shown compact (`$8.8B`), so 3 significant digits lose nothing visible and keep the
+    // snapshot small: trailing zeros compress far better than random digits.
+    marketCapUsd: significant(marketCapUsd, 3),
     peRatio,
     dividendYield,
     beta,
@@ -260,6 +263,16 @@ function pickWeighted<T>(random: Random, weighted: readonly [T, number][]): T {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
+}
+
+/** Rounds an integer quantity to `digits` significant digits (e.g. 8_842_793 → 8_840_000). */
+function significant(value: number, digits: number): number {
+  if (value === 0) {
+    return 0;
+  }
+  const magnitude =
+    10 ** Math.max(0, Math.floor(Math.log10(Math.abs(value))) + 1 - digits);
+  return Math.round(value / magnitude) * magnitude;
 }
 
 function round(value: number, decimals: number): number {

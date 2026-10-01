@@ -1,7 +1,6 @@
 import {
   ASSET_TYPES,
-  COUNTRIES,
-  CURRENCIES,
+  EXCHANGE_INFO,
   EXCHANGES,
   type Instrument,
   instrumentId,
@@ -11,6 +10,7 @@ import {
 /**
  * Wire format of the bundled market data. Columnar (one array per field) with enum fields
  * dictionary-encoded as indexes, so property names and repeated strings are not sent 10k times.
+ * Country and currency are not sent: they follow from the exchange (see `EXCHANGE_INFO`).
  * `decodeSnapshot` validates everything: the file crosses a network boundary.
  */
 
@@ -19,8 +19,6 @@ export const SNAPSHOT_SCHEMA_VERSION = 1;
 const DICTIONARIES = {
   type: ASSET_TYPES,
   exchange: EXCHANGES,
-  country: COUNTRIES,
-  currency: CURRENCIES,
   sector: SECTORS,
 } as const;
 
@@ -94,8 +92,6 @@ export function encodeSnapshot(
       peRatio: rows.map((r) => r.peRatio),
       type: enumColumn('type'),
       exchange: enumColumn('exchange'),
-      country: enumColumn('country'),
-      currency: enumColumn('currency'),
       sector: enumColumn('sector'),
       price: numberColumn('price'),
       changePct: numberColumn('changePct'),
@@ -202,8 +198,7 @@ export function decodeSnapshot(input: unknown): DecodedSnapshot {
       name: name[i] as string,
       type: enumValue('type', i),
       exchange,
-      country: enumValue('country', i),
-      currency: enumValue('currency', i),
+      ...EXCHANGE_INFO[exchange],
       sector: enumValue('sector', i),
       price: nums.price[i] as number,
       changePct: nums.changePct[i] as number,
