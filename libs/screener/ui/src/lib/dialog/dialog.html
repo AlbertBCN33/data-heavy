@@ -31,4 +31,8 @@
     </div>
     <ng-content select="[dhDialogFooter]" />
   </div>
+  <!-- The page is inert while this dialog is open: toasts render here instead (see ToastOutlet). -->
+  @if (shown()) {
+    <dh-toast-outlet scope="modal" />
+  }
 </dialog>

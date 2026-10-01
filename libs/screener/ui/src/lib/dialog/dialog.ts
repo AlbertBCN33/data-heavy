@@ -2,15 +2,19 @@ import {
   afterRenderEffect,
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   DOCUMENT,
   type ElementRef,
   inject,
   input,
   model,
+  signal,
   viewChild,
 } from '@angular/core';
 
 import { Button } from '../button/button';
+import { ModalStack } from '../modal/modal-stack';
+import { ToastOutlet } from '../toast/toast-outlet';
 
 export type DialogVariant = 'modal' | 'drawer';
 
@@ -34,7 +38,7 @@ let nextId = 0;
  */
 @Component({
   selector: 'dh-dialog',
-  imports: [Button],
+  imports: [Button, ToastOutlet],
   templateUrl: './dialog.html',
   styleUrl: './dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,9 +55,14 @@ export class Dialog {
   private readonly dialog =
     viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
   private readonly document = inject(DOCUMENT);
+  private readonly modals = inject(ModalStack);
+  /** Whether this dialog is currently counted as an open modal. */
+  protected readonly shown = signal(false);
   private returnFocusTo: HTMLElement | null = null;
 
   constructor() {
+    // Destroyed while open (e.g. navigating away): release the modal count.
+    inject(DestroyRef).onDestroy(() => this.markShown(false));
     afterRenderEffect({
       write: () => {
         const dialog = this.dialog().nativeElement;
@@ -61,6 +70,7 @@ export class Dialog {
           this.returnFocusTo = this.document
             .activeElement as HTMLElement | null;
           dialog.showModal();
+          this.markShown(true);
         } else if (!this.open() && dialog.open) {
           dialog.close();
         }
@@ -70,11 +80,24 @@ export class Dialog {
 
   /** Native `close` event: fired by `close()`, Escape, or a `method="dialog"` form. */
   protected onNativeClose(): void {
+    this.markShown(false);
     this.open.set(false);
     const target = this.returnFocusTo;
     this.returnFocusTo = null;
     if (target?.isConnected) {
       target.focus();
+    }
+  }
+
+  private markShown(shown: boolean): void {
+    if (shown === this.shown()) {
+      return;
+    }
+    this.shown.set(shown);
+    if (shown) {
+      this.modals.push();
+    } else {
+      this.modals.pop();
     }
   }
 

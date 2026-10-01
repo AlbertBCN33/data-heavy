@@ -1,12 +1,19 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ToastOutlet } from './toast-outlet';
+import { ModalStack } from '../modal/modal-stack';
+import { TOAST_LABELS, ToastOutlet } from './toast-outlet';
 import { ToastService } from './toast.service';
 
 async function setup() {
+  TestBed.configureTestingModule({
+    providers: [
+      {
+        provide: TOAST_LABELS,
+        useValue: { dismiss: 'Cerrar', region: 'Notificaciones' },
+      },
+    ],
+  });
   const fixture = TestBed.createComponent(ToastOutlet);
-  fixture.componentRef.setInput('dismissLabel', 'Cerrar');
-  fixture.componentRef.setInput('regionLabel', 'Notificaciones');
   await fixture.whenStable();
   const root = fixture.nativeElement as HTMLElement;
   return {
@@ -85,5 +92,27 @@ describe('ToastOutlet', () => {
 
     expect(pause.mock.calls).toEqual([[id], [id]]);
     expect(resume.mock.calls).toEqual([[id], [id]]);
+  });
+
+  it("holds toasts back while a modal dialog is open, for the dialog's own outlet", async () => {
+    const { fixture, service, polite } = await setup();
+    const modals = TestBed.inject(ModalStack);
+    service.show({ message: 'Saved' });
+    modals.push();
+    await fixture.whenStable();
+    expect(polite.children).toHaveLength(0);
+
+    modals.pop();
+    await fixture.whenStable();
+    expect(polite.textContent).toContain('Saved');
+  });
+
+  it('keeps showing toasts in modal scope', async () => {
+    const { fixture, service, polite } = await setup();
+    fixture.componentRef.setInput('scope', 'modal');
+    TestBed.inject(ModalStack).push();
+    service.show({ message: 'Saved' });
+    await fixture.whenStable();
+    expect(polite.textContent).toContain('Saved');
   });
 });
