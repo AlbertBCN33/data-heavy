@@ -151,8 +151,14 @@ export class ScreenerTable {
     afterEveryRender({
       read: () => {
         this.updateRenderedState();
-        if (this.pendingFocus && this.focusActiveCell()) {
-          this.pendingFocus = false;
+        if (this.pendingFocus) {
+          if (this.focusActiveCell()) {
+            this.pendingFocus = false;
+          } else {
+            // WebKit can drop a programmatic scroll when new results re-render the rows under the
+            // focused cell; keep steering toward the target until it is rendered and focused.
+            this.scrollIntoView(this.active().row);
+          }
         }
       },
     });
@@ -242,6 +248,19 @@ export class ScreenerTable {
   protected isActive(row: number, col: number): boolean {
     const active = this.active();
     return active.row === row && active.col === col;
+  }
+
+  /**
+   * Safari does not move focus to a clicked element, so a mouse user's next arrow key would start
+   * from the previous cell. Focus the clicked header explicitly, as other browsers do.
+   */
+  protected onHeaderClick(
+    event: MouseEvent,
+    key: ColumnKey,
+    col: number,
+  ): void {
+    (event.currentTarget as HTMLElement).focus({ preventScroll: true });
+    this.onHeaderActivate(key, col, event.shiftKey);
   }
 
   protected onHeaderActivate(
