@@ -1,0 +1,126 @@
+:host {
+  display: block;
+  min-block-size: 0;
+  block-size: 100%;
+}
+
+// Single scroll container for both axes: sticky header (top) and sticky symbol column (left).
+.dh-grid-scroller {
+  block-size: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  // Keep focused cells clear of the sticky header row and sticky symbol column.
+  scroll-padding-block-start: 40px;
+  scroll-padding-inline-start: 6.5rem;
+}
+
+.dh-grid {
+  min-inline-size: max-content;
+  outline: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--dh-focus);
+    outline-offset: -2px;
+  }
+}
+
+.dh-grid__header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  background: var(--dh-surface);
+  border-block-end: 1px solid var(--dh-control-border);
+}
+
+.dh-grid__row {
+  display: grid;
+  grid-template-columns: var(--dh-grid-columns);
+  block-size: 40px; // ROW_HEIGHT
+}
+
+.dh-grid__row--data {
+  border-block-end: 1px solid var(--dh-border);
+  cursor: pointer;
+
+  &:hover .dh-grid__cell {
+    background: var(--dh-surface);
+  }
+
+  &[aria-selected='true'] .dh-grid__cell {
+    background: var(--dh-selected, rgb(26 95 208 / 12%));
+  }
+
+  &[aria-selected='true'] .dh-grid__cell--pinned {
+    box-shadow: inset 3px 0 0 var(--dh-accent);
+  }
+}
+
+.dh-grid__cell {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-inline-size: 0;
+  padding: 0 0.75rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: var(--dh-bg);
+  font-variant-numeric: tabular-nums;
+
+  &:focus-visible {
+    outline: 2px solid var(--dh-focus);
+    outline-offset: -2px;
+  }
+}
+
+.dh-grid__cell--end {
+  justify-content: flex-end;
+}
+
+.dh-grid__cell--pinned {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  font-weight: 600;
+  border-inline-end: 1px solid var(--dh-border);
+}
+
+// Colour is a secondary cue; the signed value (+1.2% / −0.8%) carries the meaning.
+.dh-grid__cell--up {
+  color: var(--dh-positive);
+}
+
+.dh-grid__cell--down {
+  color: var(--dh-danger);
+}
+
+.dh-grid__columnheader {
+  background: var(--dh-surface);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dh-grid__sort {
+  font-size: 0.7em;
+
+  sup {
+    font-size: 0.85em;
+  }
+}
+
+.dh-sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// The viewport sizes to its rows; the outer scroller does the scrolling.
+cdk-virtual-scroll-viewport.dh-grid__body {
+  contain: none;
+  overflow: visible;
+}
