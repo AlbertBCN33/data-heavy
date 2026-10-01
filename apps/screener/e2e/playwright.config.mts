@@ -13,10 +13,13 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
   },
+  // CI tests the production build (what users get); locally the dev server is faster to iterate on.
   webServer: process.env['BASE_URL']
     ? undefined
     : {
-        command: 'npx nx run screener:serve',
+        command: process.env['CI']
+          ? 'npx nx run screener:serve-static'
+          : 'npx nx run screener:serve',
         url: 'http://localhost:4200',
         reuseExistingServer: !process.env['CI'],
         cwd: workspaceRoot,
