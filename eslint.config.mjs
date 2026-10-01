@@ -53,6 +53,10 @@ export default [
               onlyDependOnLibsWithTags: ['type:ui', 'type:util'],
             },
             {
+              sourceTag: 'type:tool',
+              onlyDependOnLibsWithTags: ['type:util'],
+            },
+            {
               sourceTag: 'type:util',
               onlyDependOnLibsWithTags: ['type:util'],
             },

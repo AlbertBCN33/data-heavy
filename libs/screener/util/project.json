@@ -24,7 +24,7 @@
       "options": {
         "cwd": "{projectRoot}",
         "commands": [
-          "ngc -p tsconfig.lib.json --noEmit",
+          "tsc -p tsconfig.lib.json --noEmit",
           "tsc -p tsconfig.spec.json --noEmit"
         ],
         "parallel": false
