@@ -1,9 +1,11 @@
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import {
   type ApplicationConfig,
+  isDevMode,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideServiceWorker } from '@angular/service-worker';
 import {
   DEFAULT_SIMULATION,
   provideMarketData,
@@ -25,5 +27,11 @@ export const appConfig: ApplicationConfig = {
     provideRouter(appRoutes),
     provideHttpClient(withFetch()),
     provideMarketData({ simulate: simulate && DEFAULT_SIMULATION }),
+    // Caches the app shell and market data for offline use (see ADR 0013). Production only:
+    // a service worker in development would serve stale code.
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 };

@@ -72,11 +72,20 @@ export class StaticJsonAdapter extends MarketDataPort {
     return this.readWatchlist();
   }
 
-  override async addToWatchlist(instrumentId: string): Promise<void> {
+  override async addToWatchlist(
+    instrumentId: string,
+    position?: number,
+  ): Promise<void> {
     assertValidId(instrumentId);
     const ids = this.readWatchlist();
     if (!ids.includes(instrumentId)) {
-      this.writeWatchlist([...ids, instrumentId]);
+      const at =
+        position === undefined ? ids.length : clampIndex(position, ids.length);
+      this.writeWatchlist([
+        ...ids.slice(0, at),
+        instrumentId,
+        ...ids.slice(at),
+      ]);
     }
   }
 
@@ -156,6 +165,10 @@ export class StaticJsonAdapter extends MarketDataPort {
       });
     }
   }
+}
+
+function clampIndex(index: number, length: number): number {
+  return Math.min(Math.max(Math.trunc(index), 0), length);
 }
 
 function assertValidId(instrumentId: string): void {

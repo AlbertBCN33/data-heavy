@@ -92,6 +92,8 @@ export class ScreenerTable {
   readonly columns = input.required<readonly ColumnKey[]>();
   readonly sort = input.required<readonly SortSpec[]>();
   readonly selectedId = input<string | null>(null);
+  /** Instruments on the watchlist, marked with a star in the symbol column. */
+  readonly watchedIds = input<ReadonlySet<string>>(new Set());
   readonly loading = input(false, { transform: booleanAttribute });
   /** Accessible name of the grid. */
   readonly label = input.required<string>();

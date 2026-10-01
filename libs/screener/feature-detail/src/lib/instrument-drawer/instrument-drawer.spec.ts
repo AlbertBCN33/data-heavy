@@ -30,9 +30,10 @@ class FakePort extends MarketDataPort {
       tradingDays: days,
     });
   });
-  override getWatchlist = vi.fn();
-  override addToWatchlist = vi.fn();
-  override removeFromWatchlist = vi.fn();
+  watchlist: string[] = [];
+  override getWatchlist = vi.fn(async () => [...this.watchlist]);
+  override addToWatchlist = vi.fn(async () => undefined);
+  override removeFromWatchlist = vi.fn(async () => undefined);
 }
 
 async function setup(url: string, port = new FakePort()) {
@@ -158,6 +159,24 @@ describe('InstrumentDrawer', () => {
     const { root } = await setup('/?sel=NYSE:NOPE');
     expect(root.querySelector('h2')?.textContent).toBe('Instrument not found');
     expect(root.textContent).toContain('The link may be outdated.');
+  });
+
+  it('adds to and removes from the watchlist, with a label that states the action', async () => {
+    const { port, button, settle } = await setup(`/?sel=${target.id}`);
+    const add = button('☆ Add to watchlist') as HTMLButtonElement;
+    expect(add.disabled).toBe(false);
+    expect(add.hasAttribute('aria-pressed')).toBe(false);
+
+    add.click();
+    await settle();
+    expect(port.addToWatchlist).toHaveBeenCalledWith(target.id, undefined);
+    const remove = button('★ Remove from watchlist') as HTMLButtonElement;
+    expect(remove).toBeDefined();
+
+    remove.click();
+    await settle();
+    expect(port.removeFromWatchlist).toHaveBeenCalledWith(target.id);
+    expect(button('☆ Add to watchlist')).toBeDefined();
   });
 
   it('closes by clearing the selection from the URL', async () => {

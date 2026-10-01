@@ -9,7 +9,11 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { provideScreenerStore, ScreenerStore } from '@data-heavy/data-access';
+import {
+  provideScreenerStore,
+  ScreenerStore,
+  WatchlistStore,
+} from '@data-heavy/data-access';
 import { Button, ToastService } from '@data-heavy/ui';
 import type { ColumnKey, SortSpec } from '@data-heavy/util';
 
@@ -34,6 +38,7 @@ const NARROW_SCREEN = '(max-width: 64rem)';
 })
 export class ScreenerPage {
   protected readonly store = inject(ScreenerStore);
+  protected readonly watchlist = inject(WatchlistStore);
   private readonly announcer = inject(LiveAnnouncer);
   private readonly toasts = inject(ToastService);
 

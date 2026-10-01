@@ -7,5 +7,11 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import('./screener-route/screener-route').then((m) => m.ScreenerRoute),
   },
+  {
+    path: 'watchlist',
+    title: 'Watchlist · Market Screener',
+    loadComponent: () =>
+      import('@data-heavy/feature-watchlist').then((m) => m.WatchlistPage),
+  },
   { path: '**', redirectTo: '' },
 ];

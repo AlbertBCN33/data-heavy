@@ -82,6 +82,7 @@
           [columns]="store.view().columns"
           [sort]="store.view().sort"
           [selectedId]="store.view().selected"
+          [watchedIds]="watchlist.idSet()"
           [locale]="locale"
           (sortChange)="onSortChange($event)"
           (rowActivate)="onRowActivate($event)"

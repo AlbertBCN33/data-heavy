@@ -91,9 +91,12 @@ export class SimulatedLatencyAdapter extends MarketDataPort {
     );
   }
 
-  override addToWatchlist(instrumentId: string): Promise<void> {
+  override addToWatchlist(
+    instrumentId: string,
+    position?: number,
+  ): Promise<void> {
     return this.simulate('addToWatchlist', undefined, () =>
-      this.inner.addToWatchlist(instrumentId),
+      this.inner.addToWatchlist(instrumentId, position),
     );
   }
 

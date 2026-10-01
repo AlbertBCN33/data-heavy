@@ -107,6 +107,10 @@
               [attr.data-col]="c"
             >
               {{ cellText(column, row) }}
+              @if (c === 0 && watchedIds().has(row.id)) {
+                <span class="dh-grid__star" aria-hidden="true">★</span>
+                <span class="dh-sr-only">, on watchlist</span>
+              }
             </div>
           }
         </div>

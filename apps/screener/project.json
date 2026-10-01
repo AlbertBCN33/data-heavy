@@ -38,7 +38,8 @@
             "input": "apps/screener/public"
           }
         ],
-        "styles": ["apps/screener/src/styles.scss"]
+        "styles": ["apps/screener/src/styles.scss"],
+        "serviceWorker": "apps/screener/ngsw-config.json"
       },
       "configurations": {
         "production": {

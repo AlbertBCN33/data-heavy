@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   inject,
+  Injector,
 } from '@angular/core';
 import { ScreenerUrlState } from '@data-heavy/data-access';
 import { InstrumentDrawer } from '@data-heavy/feature-detail';
@@ -27,4 +29,19 @@ export class ScreenerRoute {
   protected readonly hasSelection = computed(
     () => this.url.view().selected !== null,
   );
+
+  constructor() {
+    // The drawer changes the watchlist; feedback (Undo, Retry) comes from one shared notifier.
+    // Loaded dynamically: feature-watchlist is a lazy route, so a static import would merge it
+    // into this chunk (and Nx's boundary rule forbids it).
+    const injector = inject(Injector);
+    let destroyed = false;
+    inject(DestroyRef).onDestroy(() => (destroyed = true));
+    void import('@data-heavy/feature-watchlist').then((m) => {
+      // The route may be gone by the time the chunk arrives (fast navigation).
+      if (!destroyed) {
+        injector.get(m.WatchlistNotifications).start();
+      }
+    });
+  }
 }

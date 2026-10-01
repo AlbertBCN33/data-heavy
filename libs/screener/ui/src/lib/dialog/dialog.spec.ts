@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
+import { ModalStack } from '../modal/modal-stack';
 import { Dialog } from './dialog';
 
 @Component({
@@ -118,5 +119,29 @@ describe('Dialog', () => {
     host.variant.set('drawer');
     await fixture.whenStable();
     expect(dialog.classList).toContain('dh-dialog--drawer');
+  });
+
+  it('renders its own toast outlet while open and releases the page outlet on close', async () => {
+    const { fixture, host, dialog } = await setup();
+    const modals = TestBed.inject(ModalStack);
+    expect(dialog.querySelector('dh-toast-outlet')).toBeNull();
+
+    host.open.set(true);
+    await fixture.whenStable();
+    expect(dialog.querySelector('dh-toast-outlet')).not.toBeNull();
+    expect(modals.open()).toBe(true);
+
+    host.open.set(false);
+    await fixture.whenStable();
+    expect(dialog.querySelector('dh-toast-outlet')).toBeNull();
+    expect(modals.open()).toBe(false);
+  });
+
+  it('releases the modal count when destroyed while open', async () => {
+    const { fixture, host } = await setup();
+    host.open.set(true);
+    await fixture.whenStable();
+    fixture.destroy();
+    expect(TestBed.inject(ModalStack).open()).toBe(false);
   });
 });

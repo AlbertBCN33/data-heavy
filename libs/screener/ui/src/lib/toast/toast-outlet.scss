@@ -10,6 +10,23 @@
   pointer-events: none;
 }
 
+// Inside a dialog, toasts take their own space at the bottom instead of floating over the content,
+// so they never cover a focused control (WCAG 2.4.11 Focus Not Obscured).
+:host(.dh-toasts-host--modal) .dh-toasts {
+  position: static;
+  padding: 0 0.75rem;
+  pointer-events: auto;
+
+  &:has(li) {
+    padding-block: 0.75rem;
+    border-block-start: 1px solid var(--dh-border, #d5d9e0);
+  }
+}
+
+:host(.dh-toasts-host--modal) .dh-toast {
+  inline-size: 100%;
+}
+
 .dh-toasts__list {
   display: contents;
   margin: 0;

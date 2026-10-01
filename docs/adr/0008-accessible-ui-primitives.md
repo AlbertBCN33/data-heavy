@@ -47,3 +47,12 @@ Conventions:
   acceptable for a small, fixed set.
 - Native `<dialog>` depends on modern browsers (supported since 2022 in all evergreen browsers),
   which matches Angular 22's own browser support.
+
+## Addendum (milestone 7): toasts inside modal dialogs
+
+A modal `<dialog>` makes the rest of the page inert, including the page's toast outlet, so toast
+actions (Undo, Retry) could not be reached while the drawer was open. A popover shown above the
+modal is inert as well (verified in Chromium). Each open `dh-dialog` now renders its own toast
+outlet, and the page outlet holds toasts back while any modal is open (`ModalStack`). Toast
+labels come from a `TOAST_LABELS` token so every outlet shares the same translated text. See
+[ADR 0013](0013-optimistic-watchlist-and-offline-support.md).
