@@ -1,0 +1,47 @@
+<section class="dh-toasts" [attr.aria-label]="regionLabel()">
+  <ol class="dh-toasts__list" aria-live="assertive" aria-relevant="additions">
+    @for (toast of assertive(); track toast.id) {
+      <ng-container *ngTemplateOutlet="item; context: { $implicit: toast }" />
+    }
+  </ol>
+  <ol class="dh-toasts__list" aria-live="polite" aria-relevant="additions">
+    @for (toast of polite(); track toast.id) {
+      <ng-container *ngTemplateOutlet="item; context: { $implicit: toast }" />
+    }
+  </ol>
+</section>
+
+<ng-template #item let-toast>
+  <li
+    class="dh-toast"
+    [class]="'dh-toast--' + toast.kind"
+    (mouseenter)="service.pause(toast.id)"
+    (mouseleave)="service.resume(toast.id)"
+    (focusin)="service.pause(toast.id)"
+    (focusout)="service.resume(toast.id)"
+  >
+    <p class="dh-toast__message">{{ toast.message }}</p>
+    @if (toast.action; as action) {
+      <button
+        dhButton
+        size="sm"
+        variant="secondary"
+        type="button"
+        (click)="service.runAction(toast.id)"
+      >
+        {{ action.label }}
+      </button>
+    }
+    <button
+      dhButton
+      size="sm"
+      variant="ghost"
+      type="button"
+      class="dh-toast__dismiss"
+      [attr.aria-label]="dismissLabel()"
+      (click)="service.dismiss(toast.id)"
+    >
+      <span aria-hidden="true">✕</span>
+    </button>
+  </li>
+</ng-template>
