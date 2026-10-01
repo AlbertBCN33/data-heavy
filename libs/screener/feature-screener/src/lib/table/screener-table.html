@@ -31,7 +31,7 @@
             [attr.data-col]="c"
             (click)="onHeaderActivate(column.key, c, $event.shiftKey)"
           >
-            <span>{{ labels[column.key] }}</span>
+            <span>{{ columnLabelKey(column.key) | translate }}</span>
             @if (state) {
               <span class="dh-grid__sort" aria-hidden="true">
                 {{ state.dir === 'asc' ? '▲' : '▼' }}
@@ -40,10 +40,18 @@
                 }
               </span>
               @if (state.priority > 1) {
-                <span class="dh-sr-only"
-                  >, sort {{ state.priority }},
-                  {{ state.dir === 'asc' ? 'ascending' : 'descending' }}</span
-                >
+                <span class="dh-sr-only">{{
+                  'screener.sortPriority'
+                    | translate
+                      : {
+                          priority: state.priority,
+                          direction:
+                            (state.dir === 'asc'
+                              ? 'screener.ascending'
+                              : 'screener.descending'
+                            ) | translate,
+                        }
+                }}</span>
               }
             }
           </div>
@@ -109,7 +117,9 @@
               {{ cellText(column, row) }}
               @if (c === 0 && watchedIds().has(row.id)) {
                 <span class="dh-grid__star" aria-hidden="true">★</span>
-                <span class="dh-sr-only">, on watchlist</span>
+                <span class="dh-sr-only">{{
+                  'screener.onWatchlist' | translate
+                }}</span>
               }
             </div>
           }

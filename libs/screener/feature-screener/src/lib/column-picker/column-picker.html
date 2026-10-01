@@ -1,12 +1,18 @@
-<button dhButton type="button" size="sm" (click)="openPicker()">Columns</button>
+<button dhButton type="button" size="sm" (click)="openPicker()">
+  {{ 'columnPicker.button' | translate }}
+</button>
 
-<dh-dialog [(open)]="open" label="Columns" closeLabel="Close">
+<dh-dialog
+  [(open)]="open"
+  [label]="'columnPicker.title' | translate"
+  [closeLabel]="'columnPicker.close' | translate"
+>
   <p class="dh-columns__hint">
-    Choose which columns to show and in which order. Symbol is always first.
+    {{ 'columnPicker.hint' | translate }}
   </p>
   <ol class="dh-columns__list">
     @for (choice of draft(); track choice.key; let i = $index, last = $last) {
-      @let label = labels[choice.key];
+      @let label = columnLabelKey(choice.key) | translate;
       <li class="dh-columns__item">
         <label class="dh-columns__toggle">
           <input
@@ -26,7 +32,7 @@
               variant="ghost"
               [id]="moveId(choice.key, 'up')"
               [disabled]="i <= 1"
-              [attr.aria-label]="'Move ' + label + ' up'"
+              [attr.aria-label]="'columnPicker.moveUp' | translate: { label }"
               (click)="move(i, -1)"
             >
               <span aria-hidden="true">↑</span>
@@ -38,7 +44,7 @@
               variant="ghost"
               [id]="moveId(choice.key, 'down')"
               [disabled]="last"
-              [attr.aria-label]="'Move ' + label + ' down'"
+              [attr.aria-label]="'columnPicker.moveDown' | translate: { label }"
               (click)="move(i, 1)"
             >
               <span aria-hidden="true">↓</span>
@@ -50,12 +56,14 @@
   </ol>
   <div dhDialogFooter class="dh-columns__footer">
     <button dhButton type="button" variant="ghost" (click)="resetToDefault()">
-      Reset to default
+      {{ 'columnPicker.reset' | translate }}
     </button>
     <span class="dh-columns__spacer"></span>
-    <button dhButton type="button" (click)="open.set(false)">Cancel</button>
+    <button dhButton type="button" (click)="open.set(false)">
+      {{ 'columnPicker.cancel' | translate }}
+    </button>
     <button dhButton type="button" variant="primary" (click)="applyChanges()">
-      Apply
+      {{ 'columnPicker.apply' | translate }}
     </button>
   </div>
 </dh-dialog>

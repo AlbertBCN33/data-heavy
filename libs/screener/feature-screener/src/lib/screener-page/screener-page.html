@@ -1,11 +1,15 @@
 <div class="dh-screener">
   <header class="dh-screener__header">
     <div>
-      <h1 class="dh-screener__title">Market screener</h1>
+      <h1 class="dh-screener__title">
+        {{ 'screener.heading' | translate }}
+      </h1>
       <p class="dh-screener__count">
         {{ countText() }}
         @if (store.updating() && state() === 'ready') {
-          <span class="dh-screener__updating">Updating…</span>
+          <span class="dh-screener__updating">{{
+            'screener.updating' | translate
+          }}</span>
         }
       </p>
     </div>
@@ -18,9 +22,9 @@
   <aside class="dh-screener__filters" aria-labelledby="dh-filters-heading">
     <div class="dh-screener__filters-head">
       <h2 id="dh-filters-heading" class="dh-screener__subtitle">
-        Filters
+        {{ 'filters.heading' | translate }}
         @if (activeFilters() > 0) {
-          <span class="dh-screener__badge">{{ activeFilters() }} active</span>
+          <span class="dh-screener__badge">{{ activeFiltersLabel() }}</span>
         }
       </h2>
       <button
@@ -42,18 +46,21 @@
     >
       <dh-filter-panel
         [view]="store.view()"
-        [locale]="locale"
+        [locale]="locale()"
         (filterChange)="onFilterChange($event)"
         (clearAll)="store.reset()"
       />
     </div>
   </aside>
 
-  <section class="dh-screener__results" aria-label="Results">
+  <section
+    class="dh-screener__results"
+    [attr.aria-label]="'screener.results' | translate"
+  >
     @switch (state()) {
       @case ('error') {
         <div class="dh-screener__message" role="alert">
-          <p>Market data could not be loaded.</p>
+          <p>{{ 'screener.loadError' | translate }}</p>
           @if (store.retryable()) {
             <button
               dhButton
@@ -61,29 +68,29 @@
               type="button"
               (click)="store.reload()"
             >
-              Try again
+              {{ 'screener.retry' | translate }}
             </button>
           }
         </div>
       }
       @case ('empty') {
         <div class="dh-screener__message">
-          <p>No instruments match these filters.</p>
+          <p>{{ 'screener.empty' | translate }}</p>
           <button dhButton type="button" (click)="store.reset()">
-            Clear filters
+            {{ 'screener.clearFilters' | translate }}
           </button>
         </div>
       }
       @default {
         <dh-screener-table
-          label="Instruments"
+          [label]="'screener.gridLabel' | translate"
           [loading]="state() === 'loading'"
           [rows]="store.rows()"
           [columns]="store.view().columns"
           [sort]="store.view().sort"
           [selectedId]="store.view().selected"
           [watchedIds]="watchlist.idSet()"
-          [locale]="locale"
+          [locale]="locale()"
           (sortChange)="onSortChange($event)"
           (rowActivate)="onRowActivate($event)"
         />
