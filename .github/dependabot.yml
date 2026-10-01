@@ -1,0 +1,36 @@
+version: 2
+updates:
+  # Actions are pinned to commit SHAs; Dependabot keeps the SHAs and version comments current.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci
+
+  # Dependencies are pinned exactly. Framework packages move together through `nx migrate`,
+  # so Dependabot ignores them and only proposes the rest, grouped to keep PR noise low.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: '@angular/*'
+      - dependency-name: '@angular-devkit/*'
+      - dependency-name: '@schematics/angular'
+      - dependency-name: '@nx/*'
+      - dependency-name: 'nx'
+      - dependency-name: 'typescript'
+    groups:
+      dev-tooling:
+        dependency-type: development
+        update-types: [minor, patch]
+      runtime:
+        dependency-type: production
+        update-types: [minor, patch]
+    commit-message:
+      prefix: build
