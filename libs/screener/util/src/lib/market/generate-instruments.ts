@@ -7,6 +7,7 @@ import {
   SECTORS,
   type Sector,
 } from './instrument';
+import { generateCloses, TRADING_DAYS_PER_YEAR } from './price-history';
 
 /**
  * Deterministic generator for a realistic-looking instrument universe. The same seed and count
@@ -171,13 +172,14 @@ function makeInstrument(
     clamp(random.normal(isEtf ? 0.95 : 1.05, isEtf ? 0.2 : 0.4), 0.2, 2.6),
     2,
   );
-  const spread = clamp(
-    0.15 + Math.abs(random.normal(0, 0.18)) * beta,
-    0.05,
-    1.5,
+  // The 52-week range is taken from the same deterministic series the chart shows, so the
+  // numbers in the detail drawer always agree with its one-year chart.
+  const year = generateCloses(
+    { id, price, changePct, beta, currency },
+    TRADING_DAYS_PER_YEAR,
   );
-  const high52w = round(price * (1 + random.float(0, spread)), decimals);
-  const low52w = round(price / (1 + random.float(0, spread)), decimals);
+  const high52w = Math.max(...year);
+  const low52w = Math.min(...year);
 
   const peRatio =
     isEtf || random.chance(0.14)
@@ -207,8 +209,8 @@ function makeInstrument(
     peRatio,
     dividendYield,
     beta,
-    high52w: Math.max(high52w, price),
-    low52w: Math.min(low52w, price),
+    high52w,
+    low52w,
   };
 }
 
