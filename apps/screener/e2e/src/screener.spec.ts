@@ -175,12 +175,31 @@ test.describe('screener', () => {
     await expect(columnHeader(page, 'Volume')).toHaveCount(0);
   });
 
-  test('ignores invalid link settings and says so', async ({ page }) => {
-    await openScreener(page, '?price=cheap&sector=Crypto');
+  test('ignores invalid link settings and says so, accessibly', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openScreener(
+      page,
+      '?price=cheap&sector=Crypto&utm_source=newsletter',
+    );
     await expect(
       page.getByText('Some settings in this link were not recognised'),
     ).toBeVisible();
     await expect(page.getByText('10,000 of 10,000 instruments')).toBeVisible();
+
+    const withToast = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+    expect(withToast.violations).toEqual([]);
+  });
+
+  test('does not complain about tracking params or empty values', async ({
+    page,
+  }) => {
+    await openScreener(page, '?utm_source=newsletter&fbclid=abc&sel=&price=');
+    await expect(page.getByText('10,000 of 10,000 instruments')).toBeVisible();
+    await expect(
+      page.getByText('Some settings in this link were not recognised'),
+    ).toHaveCount(0);
   });
 
   test('shows an empty state with a way out', async ({ page }) => {
@@ -208,5 +227,22 @@ test.describe('screener', () => {
     await expect(page.getByRole('dialog', { name: 'Columns' })).toBeVisible();
     const dialog = await new AxeBuilder({ page }).withTags(WCAG).analyze();
     expect(dialog.violations).toEqual([]);
+  });
+
+  test('has no detectable WCAG 2.2 AA violations in dark mode', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'dark' });
+    // Gains and losses both on screen, plus a selected row.
+    await openScreener(page, '?sort=-changePct');
+    await page
+      .locator('[role="row"][aria-rowindex="2"] [role="rowheader"]')
+      .click();
+    const dark = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+    expect(dark.violations).toEqual([]);
+
+    await openScreener(page, '?sort=changePct');
+    const losses = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+    expect(losses.violations).toEqual([]);
   });
 });
