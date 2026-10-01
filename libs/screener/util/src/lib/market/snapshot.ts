@@ -192,13 +192,17 @@ export function decodeSnapshot(input: unknown): DecodedSnapshot {
   for (let i = 0; i < count; i++) {
     const exchange = enumValue('exchange', i);
     const sym = symbol[i] as string;
+    // Explicit fields, not `...EXCHANGE_INFO[exchange]`: the build lowers object spread to a
+    // property-descriptor helper that made this loop 426 ms slower at 50k rows (docs/performance.md).
+    const { country, currency } = EXCHANGE_INFO[exchange];
     instruments[i] = {
       id: instrumentId(exchange, sym),
       symbol: sym,
       name: name[i] as string,
       type: enumValue('type', i),
       exchange,
-      ...EXCHANGE_INFO[exchange],
+      country,
+      currency,
       sector: enumValue('sector', i),
       price: nums.price[i] as number,
       changePct: nums.changePct[i] as number,
