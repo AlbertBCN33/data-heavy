@@ -87,11 +87,11 @@
 
 // Colour is a secondary cue; the signed value (+1.2% / −0.8%) carries the meaning.
 .dh-grid__cell--up {
-  color: var(--dh-positive);
+  color: var(--dh-positive-text);
 }
 
 .dh-grid__cell--down {
-  color: var(--dh-danger);
+  color: var(--dh-negative-text);
 }
 
 .dh-grid__columnheader {

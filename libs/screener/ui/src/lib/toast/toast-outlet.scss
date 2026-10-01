@@ -45,8 +45,9 @@
   margin: 0;
 }
 
-.dh-toast__dismiss {
-  color: inherit;
+// More specific than the ghost button colour, which is meant for light surfaces.
+.dh-toast .dh-toast__dismiss {
+  color: var(--dh-toast-text, #f3f4f6);
 }
 
 @keyframes dh-toast-in {
