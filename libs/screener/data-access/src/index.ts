@@ -1,6 +1,7 @@
 // Public API of @data-heavy/data-access.
 
 export * from './lib/key-value-storage';
+export * from './lib/locale/locale-state';
 export * from './lib/market-data-error';
 export * from './lib/market-data.port';
 export * from './lib/network/network-status';

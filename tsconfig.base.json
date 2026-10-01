@@ -16,6 +16,9 @@
     "strict": true,
     "paths": {
       "@data-heavy/data-access": ["./libs/screener/data-access/src/index.ts"],
+      "@data-heavy/data-access/locale": [
+        "./libs/screener/data-access/src/locale.ts"
+      ],
       "@data-heavy/data-access/network": [
         "./libs/screener/data-access/src/network.ts"
       ],
