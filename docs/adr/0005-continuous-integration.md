@@ -23,11 +23,11 @@ to `main`:
 
 Caching:
 
-| What                | How                                                                 |
-| ------------------- | ------------------------------------------------------------------- |
-| npm downloads       | `actions/setup-node` with `cache: npm`, keyed on `package-lock.json` |
+| What                | How                                                                              |
+| ------------------- | -------------------------------------------------------------------------------- |
+| npm downloads       | `actions/setup-node` with `cache: npm`, keyed on `package-lock.json`             |
 | Nx task results     | `actions/cache` on `.nx/cache`, keyed on lockfile + commit, restoring the latest |
-| Playwright browsers | `actions/cache` keyed on the installed Playwright version           |
+| Playwright browsers | `actions/cache` keyed on the installed Playwright version                        |
 
 Hardening:
 

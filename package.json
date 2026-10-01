@@ -14,8 +14,8 @@
     "lint": "nx run-many -t lint",
     "typecheck": "nx run-many -t typecheck",
     "e2e": "nx e2e e2e-screener",
-    "format": "nx format:write",
-    "format:check": "nx format:check"
+    "format": "nx format:write --all",
+    "format:check": "nx format:check --all"
   },
   "dependencies": {
     "@angular/common": "22.2.1",

@@ -58,7 +58,7 @@ jobs:
             nx-${{ runner.os }}-
 
       - name: Format check
-        run: npx nx format:check
+        run: npx nx format:check --all
 
       - name: Lint, typecheck, test, build (affected)
         run: npx nx affected -t lint typecheck test build --parallel=3
