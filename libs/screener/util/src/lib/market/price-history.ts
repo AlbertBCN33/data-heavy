@@ -8,15 +8,25 @@ export interface PriceHistoryOptions {
   readonly tradingDays: number;
 }
 
+/** The fields that determine an instrument's price series. */
+export type PriceSeriesSource = Pick<
+  Instrument,
+  'id' | 'price' | 'changePct' | 'beta' | 'currency'
+>;
+
+/** Trading days in the one-year window used for the 52-week high and low. */
+export const TRADING_DAYS_PER_YEAR = 252;
+
 /**
- * Deterministic daily closes for an instrument: a random walk generated backwards from the
- * current price, so the last point always equals `instrument.price`. Volatility scales with
- * beta. Weekends are skipped; holidays are ignored.
+ * Deterministic daily closes, oldest first: a random walk generated backwards from the current
+ * price. The last close equals `price`, the one before it reflects `changePct`, and volatility
+ * scales with beta. Because the walk starts from today, a shorter series is exactly the tail of a
+ * longer one, so every chart range and the 52-week high/low agree.
  */
-export function generatePriceHistory(
-  instrument: Pick<Instrument, 'id' | 'price' | 'beta' | 'currency'>,
-  { endDate, tradingDays }: PriceHistoryOptions,
-): PricePoint[] {
+export function generateCloses(
+  instrument: PriceSeriesSource,
+  tradingDays: number,
+): number[] {
   if (!Number.isInteger(tradingDays) || tradingDays < 1) {
     throw new RangeError(
       `tradingDays must be a positive integer, got ${tradingDays}`,
@@ -27,17 +37,27 @@ export function generatePriceHistory(
   const dailyVol = 0.012 * Math.max(0.3, instrument.beta);
   const drift = random.normal(0.0003, 0.0004);
 
-  const dates = tradingDaysEndingAt(endDate, tradingDays);
   const closes = new Array<number>(tradingDays);
   let price = instrument.price;
   for (let i = tradingDays - 1; i >= 0; i--) {
     closes[i] = round(price, decimals);
-    // Walk backwards: divide by the forward return.
-    price = Math.max(
-      price / Math.exp(drift + random.normal(0, dailyVol)),
-      0.01,
-    );
+    // Walk backwards: divide by the forward return. The first step back is today's change.
+    const back =
+      i === tradingDays - 1
+        ? 1 + instrument.changePct / 100
+        : Math.exp(drift + random.normal(0, dailyVol));
+    price = Math.max(price / back, 0.01);
   }
+  return closes;
+}
+
+/** {@link generateCloses} with trading dates (weekdays; holidays are ignored). */
+export function generatePriceHistory(
+  instrument: PriceSeriesSource,
+  { endDate, tradingDays }: PriceHistoryOptions,
+): PricePoint[] {
+  const closes = generateCloses(instrument, tradingDays);
+  const dates = tradingDaysEndingAt(endDate, tradingDays);
   return dates.map((date, i) => ({ date, close: closes[i] as number }));
 }
 

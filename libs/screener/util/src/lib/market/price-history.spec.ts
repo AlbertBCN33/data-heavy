@@ -1,8 +1,9 @@
-import { generatePriceHistory } from './price-history';
+import { generateCloses, generatePriceHistory } from './price-history';
 
 const instrument = {
   id: 'NYSE:ABC',
   price: 123.45,
+  changePct: 2.5,
   beta: 1.2,
   currency: 'USD',
 } as const;
@@ -58,10 +59,27 @@ describe('generatePriceHistory', () => {
 
   it('uses whole numbers for zero-decimal currencies', () => {
     const yen = generatePriceHistory(
-      { id: 'TSE:7203', price: 2500, beta: 0.9, currency: 'JPY' },
+      {
+        id: 'TSE:7203',
+        price: 2500,
+        changePct: -1,
+        beta: 0.9,
+        currency: 'JPY',
+      },
       { endDate: '2026-09-30', tradingDays: 20 },
     );
     expect(yen.every((p) => Number.isInteger(p.close))).toBe(true);
+  });
+
+  it("reflects today's change in the last step", () => {
+    const [previous, last] = history.slice(-2).map((p) => p.close);
+    expect(last).toBe(123.45);
+    expect(previous).toBeCloseTo(123.45 / 1.025, 2);
+  });
+
+  it('makes shorter ranges the exact tail of longer ones', () => {
+    const month = generateCloses(instrument, 21);
+    expect(month).toEqual(history.slice(-21).map((p) => p.close));
   });
 
   it('rejects invalid input', () => {

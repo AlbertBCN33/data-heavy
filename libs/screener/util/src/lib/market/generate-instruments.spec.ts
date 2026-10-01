@@ -1,5 +1,6 @@
 import { generateInstruments } from './generate-instruments';
 import { EXCHANGE_INFO, INSTRUMENT_ID_PATTERN } from './instrument';
+import { generateCloses, TRADING_DAYS_PER_YEAR } from './price-history';
 
 describe('generateInstruments', () => {
   const rows = generateInstruments(42, 2_000);
@@ -36,6 +37,14 @@ describe('generateInstruments', () => {
         expect(row.symbol).toMatch(/^\d{4}$/);
         expect(Number.isInteger(row.price)).toBe(true);
       }
+    }
+  });
+
+  it('takes the 52-week range from the same series the chart shows', () => {
+    for (const row of rows.slice(0, 200)) {
+      const year = generateCloses(row, TRADING_DAYS_PER_YEAR);
+      expect(row.high52w).toBe(Math.max(...year));
+      expect(row.low52w).toBe(Math.min(...year));
     }
   });
 

@@ -16,3 +16,4 @@ One decision per file. Superseded ADRs are kept and marked, never rewritten.
 | [0009](0009-filter-and-sort-in-a-web-worker.md)    | Filter and sort in a Web Worker                      | Accepted |
 | [0010](0010-virtualized-accessible-grid.md)        | Virtualized, accessible data grid                    | Accepted |
 | [0011](0011-url-as-the-source-of-truth.md)         | The URL is the source of truth for the screener view | Accepted |
+| [0012](0012-price-chart-as-hand-rolled-svg.md)     | Price chart as a small hand-rolled SVG               | Accepted |
