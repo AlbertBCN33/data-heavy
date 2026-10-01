@@ -52,13 +52,24 @@ export class WatchlistPage {
   protected readonly locale = inject(LocaleState).locale;
   protected readonly skeletonRows = [1, 2, 3];
 
+  /**
+   * An empty watchlist needs no market data, so its empty state shows as soon as the watchlist has
+   * loaded instead of waiting for the snapshot (it is this page's largest paint).
+   */
   protected readonly status = computed(() => {
-    if (this.store.status() === 'error' || this.market.status() === 'error') {
-      return 'error';
+    const store = this.store.status();
+    if (store !== 'ready') {
+      return store === 'error' ? 'error' : 'loading';
     }
-    return this.store.status() === 'ready' && this.market.status() === 'ready'
+    if (this.store.ids().length === 0) {
+      return 'ready';
+    }
+    const market = this.market.status();
+    return market === 'ready'
       ? 'ready'
-      : 'loading';
+      : market === 'error'
+        ? 'error'
+        : 'loading';
   });
 
   protected readonly rows = computed<readonly Row[]>(() => {

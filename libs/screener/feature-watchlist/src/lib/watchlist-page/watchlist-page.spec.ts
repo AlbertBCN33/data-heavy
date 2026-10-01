@@ -49,6 +49,34 @@ async function setup(port = new FakePort()) {
     }
   };
   await settle();
+  return withHelpers(fixture, root, port, settle);
+}
+
+/** For a market load that never settles: `whenStable` would wait on it forever. */
+async function setupWithPendingMarketData(port: FakePort) {
+  port.loadMarketData.mockImplementation(() => new Promise(() => undefined));
+  TestBed.configureTestingModule({
+    providers: [
+      provideRouter([]),
+      { provide: MarketDataPort, useValue: port },
+      { provide: KEY_VALUE_STORAGE, useValue: memoryStorage() },
+    ],
+  });
+  const fixture = TestBed.createComponent(WatchlistPage);
+  const root = fixture.nativeElement as HTMLElement;
+  for (let i = 0; i < 3; i++) {
+    await new Promise((r) => setTimeout(r));
+    fixture.detectChanges();
+  }
+  return root;
+}
+
+function withHelpers(
+  fixture: ReturnType<typeof TestBed.createComponent<WatchlistPage>>,
+  root: HTMLElement,
+  port: FakePort,
+  settle: () => Promise<void>,
+) {
   const removeButtons = () =>
     Array.from(
       root.querySelectorAll<HTMLButtonElement>('.dh-watchlist__remove'),
@@ -113,6 +141,29 @@ describe('WatchlistPage', () => {
     port.watchlist = [];
     const { root } = await setup(port);
     expect(root.querySelector('a')?.getAttribute('href')).toBe('/');
+  });
+
+  it('shows the empty state without waiting for market data', async () => {
+    const port = new FakePort();
+    port.watchlist = [];
+    const root = await setupWithPendingMarketData(port);
+    expect(root.textContent).toContain('Your watchlist is empty.');
+    expect(root.querySelector('[aria-busy="true"]')).toBeNull();
+  });
+
+  it('waits for market data before listing watched instruments', async () => {
+    const root = await setupWithPendingMarketData(new FakePort());
+    expect(root.querySelector('[aria-busy="true"]')).not.toBeNull();
+    expect(root.querySelector('table')).toBeNull();
+  });
+
+  it('reports a market data error when there are instruments to show', async () => {
+    const port = new FakePort();
+    port.loadMarketData.mockRejectedValue(
+      new MarketDataError('network', 'down'),
+    );
+    const { root } = await setup(port);
+    expect(root.querySelector('[role="alert"]')).not.toBeNull();
   });
 
   it('shows a retryable error', async () => {
