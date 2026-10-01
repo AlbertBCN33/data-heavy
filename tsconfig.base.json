@@ -8,13 +8,32 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "es2015",
+    "target": "es2022",
     "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "lib": ["es2022", "dom", "dom.iterable"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "strict": false,
-    "paths": {}
+    "strict": true,
+    "paths": {
+      "@data-heavy/feature-screener": [
+        "./libs/screener/feature-screener/src/index.ts"
+      ],
+      "@data-heavy/feature-detail": [
+        "./libs/screener/feature-detail/src/index.ts"
+      ],
+      "@data-heavy/feature-watchlist": [
+        "./libs/screener/feature-watchlist/src/index.ts"
+      ],
+      "@data-heavy/data-access": ["./libs/screener/data-access/src/index.ts"],
+      "@data-heavy/ui": ["./libs/screener/ui/src/index.ts"],
+      "@data-heavy/util": ["./libs/screener/util/src/index.ts"]
+    },
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true
   },
   "exclude": ["node_modules", "tmp"]
 }

@@ -1,13 +1,15 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "defaultBase": "master",
+  "defaultBase": "main",
   "analytics": false,
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
       "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/eslint.config.mjs"
+      "!{projectRoot}/eslint.config.mjs",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json"
     ],
     "sharedGlobals": []
   },
@@ -27,6 +29,14 @@
         "{workspaceRoot}/eslint.config.mjs",
         "{workspaceRoot}/tools/eslint-rules/**/*"
       ]
+    },
+    "typecheck": {
+      "cache": true,
+      "inputs": ["default", "^default"]
+    },
+    "test": {
+      "cache": true,
+      "inputs": ["default", "^production"]
     }
   },
   "plugins": [
@@ -41,6 +51,12 @@
       "options": {
         "targetName": "lint"
       }
+    },
+    {
+      "plugin": "@nx/vitest",
+      "options": {
+        "testTargetName": "test"
+      }
     }
   ],
   "generators": {
@@ -48,7 +64,16 @@
       "e2eTestRunner": "playwright",
       "linter": "eslint",
       "style": "scss",
-      "unitTestRunner": "vitest"
+      "unitTestRunner": "vitest-analog"
+    },
+    "@nx/angular:library": {
+      "linter": "eslint",
+      "unitTestRunner": "vitest-analog"
+    },
+    "@nx/angular:component": {
+      "style": "scss",
+      "changeDetection": "OnPush",
+      "type": "component"
     }
   }
 }
