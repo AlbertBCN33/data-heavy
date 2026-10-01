@@ -13,3 +13,6 @@ One decision per file. Superseded ADRs are kept and marked, never rewritten.
 | [0006](0006-market-data-snapshot-and-adapters.md)  | Market data: generated snapshot behind a port        | Accepted |
 | [0007](0007-state-management-with-signals.md)      | State management with signal-based services          | Accepted |
 | [0008](0008-accessible-ui-primitives.md)           | Accessible UI primitives without a component library | Accepted |
+| [0009](0009-filter-and-sort-in-a-web-worker.md)    | Filter and sort in a Web Worker                      | Accepted |
+| [0010](0010-virtualized-accessible-grid.md)        | Virtualized, accessible data grid                    | Accepted |
+| [0011](0011-url-as-the-source-of-truth.md)         | The URL is the source of truth for the screener view | Accepted |

@@ -55,3 +55,15 @@ The e2e project lives inside the app it tests (`apps/screener/e2e`) rather than 
 folder with it. It stays a separate Nx project (`e2e-screener`, tag `type:e2e`) with its own
 Playwright ESLint config. The app's ESLint config ignores `e2e/**`, and Nx assigns files to the
 innermost project, so a change to an e2e spec does not invalidate the app's cached build or tests.
+
+## Secondary entry points
+
+Code shared between the eagerly loaded shell and a lazily loaded feature ends up in a shared
+chunk that loads up front. If the shell imports a library's main barrel, everything that barrel
+re-exports can land in the initial bundle. Measured here: importing `ToastOutlet` from
+`@data-heavy/ui` pulled the CDK, Angular Aria and every primitive into the initial chunk
+(112 kB instead of 86 kB transferred).
+
+The shell therefore imports only from narrow secondary entry points
+(`@data-heavy/ui/toast`, `@data-heavy/data-access/providers`). Features keep importing from the
+main entry points, which only load lazily. Test-only helpers live in `@data-heavy/ui/testing`.
