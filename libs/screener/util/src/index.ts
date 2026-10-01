@@ -1,6 +1,8 @@
 // Public API of @data-heavy/util. Pure TypeScript only: no Angular, no DOM, no I/O.
 
 export * from './lib/format/formatters';
+export * from './lib/i18n/languages';
+export * from './lib/i18n/number-input';
 export * from './lib/market/columns';
 export * from './lib/market/generate-instruments';
 export * from './lib/market/instrument';
