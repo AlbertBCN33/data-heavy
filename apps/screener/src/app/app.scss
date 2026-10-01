@@ -1,0 +1,35 @@
+:host {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-block-size: 100dvh;
+}
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: 0.5rem;
+  inset-block-start: -3rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--dh-surface);
+  color: var(--dh-text);
+  z-index: 100;
+
+  &:focus {
+    inset-block-start: 0.5rem;
+  }
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-block-end: 1px solid var(--dh-border);
+}
+
+.app-title {
+  font-weight: 600;
+}
+
+.app-main {
+  min-inline-size: 0;
+  outline: none;
+}

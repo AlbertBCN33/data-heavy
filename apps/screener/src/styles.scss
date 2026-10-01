@@ -1,1 +1,51 @@
-/* You can add global styles to this file, and also import other style files */
+// Design tokens. Components consume these custom properties only.
+:root {
+  color-scheme: light dark;
+  --dh-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --dh-bg: #ffffff;
+  --dh-surface: #f5f6f8;
+  --dh-text: #14171c;
+  --dh-text-muted: #545b66;
+  --dh-border: #d5d9e0;
+  --dh-focus: #1a5fd0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --dh-bg: #111418;
+    --dh-surface: #1b1f25;
+    --dh-text: #e8eaee;
+    --dh-text-muted: #a3a9b3;
+    --dh-border: #333a44;
+    --dh-focus: #7fb0ff;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--dh-font);
+  background: var(--dh-bg);
+  color: var(--dh-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--dh-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
