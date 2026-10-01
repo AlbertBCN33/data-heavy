@@ -1,0 +1,91 @@
+<div class="dh-watchlist">
+  <h1 class="dh-watchlist__title" tabindex="-1">Watchlist</h1>
+
+  @if (store.queuedCount() > 0) {
+    <p class="dh-watchlist__note" role="status">
+      {{ queuedMessage() }}
+    </p>
+  }
+
+  @switch (status()) {
+    @case ('error') {
+      <div class="dh-watchlist__message" role="alert">
+        <p>Your watchlist could not be loaded.</p>
+        <button dhButton variant="primary" type="button" (click)="retry()">
+          Try again
+        </button>
+      </div>
+    }
+    @case ('loading') {
+      <div class="dh-watchlist__list" aria-busy="true">
+        @for (n of skeletonRows; track n) {
+          <dh-skeleton height="2.75rem" />
+        }
+      </div>
+    }
+    @default {
+      @if (rows().length === 0) {
+        <div class="dh-watchlist__message">
+          <p>Your watchlist is empty.</p>
+          <p>
+            Open an instrument in the <a routerLink="/">screener</a> and choose
+            “Add to watchlist”.
+          </p>
+        </div>
+      } @else {
+        <table class="dh-watchlist__table">
+          <caption class="dh-watchlist__caption">
+            {{
+              rows().length
+            }}
+            watched instruments
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Symbol</th>
+              <th scope="col">Name</th>
+              <th scope="col" class="dh-watchlist__num">Price</th>
+              <th scope="col" class="dh-watchlist__num">Change</th>
+              <th scope="col"><span class="dh-sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.id; let i = $index) {
+              <tr>
+                <th scope="row">
+                  <a [routerLink]="['/']" [queryParams]="{ sel: row.id }">{{
+                    row.symbol
+                  }}</a>
+                </th>
+                <td>{{ row.name }}</td>
+                <td class="dh-watchlist__num">{{ row.price }}</td>
+                <td
+                  class="dh-watchlist__num"
+                  [class.dh-watchlist__up]="row.trend === 'up'"
+                  [class.dh-watchlist__down]="row.trend === 'down'"
+                >
+                  {{ row.change }}
+                </td>
+                <td class="dh-watchlist__actions">
+                  <button
+                    dhButton
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    class="dh-watchlist__remove"
+                    [attr.aria-label]="
+                      'Remove ' + row.symbol + ' from watchlist'
+                    "
+                    (click)="remove(i, row.id)"
+                  >
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  }
+</div>

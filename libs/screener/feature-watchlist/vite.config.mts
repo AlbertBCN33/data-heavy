@@ -15,7 +15,6 @@ export default defineConfig(() => ({
   test: {
     name: 'feature-watchlist',
     watch: false,
-    passWithNoTests: true,
     globals: true,
     environment: 'jsdom',
     include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],

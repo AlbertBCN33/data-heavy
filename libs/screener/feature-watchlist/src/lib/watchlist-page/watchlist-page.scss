@@ -1,0 +1,89 @@
+:host {
+  display: block;
+  overflow: auto;
+  block-size: 100%;
+}
+
+.dh-watchlist {
+  max-inline-size: 56rem;
+  padding: 1rem 1.5rem 2rem;
+}
+
+.dh-watchlist__title {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  outline: none;
+}
+
+.dh-watchlist__note {
+  margin: 0 0 1rem;
+  color: var(--dh-text-muted);
+}
+
+.dh-watchlist__list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.dh-watchlist__message {
+  padding: 2rem 0;
+
+  p {
+    margin: 0 0 0.75rem;
+  }
+}
+
+.dh-watchlist__table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    border-block-end: 1px solid var(--dh-border);
+    text-align: start;
+  }
+
+  thead th {
+    background: var(--dh-surface);
+    font-size: 0.875rem;
+  }
+
+  a {
+    color: var(--dh-accent);
+    font-weight: 600;
+  }
+}
+
+.dh-watchlist__caption {
+  padding-block-end: 0.5rem;
+  text-align: start;
+  color: var(--dh-text-muted);
+}
+
+.dh-watchlist__table .dh-watchlist__num {
+  text-align: end;
+}
+
+.dh-watchlist__up {
+  color: var(--dh-positive-text);
+}
+
+.dh-watchlist__down {
+  color: var(--dh-negative-text);
+}
+
+.dh-watchlist__actions {
+  inline-size: 1%;
+  white-space: nowrap;
+}
+
+.dh-sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
