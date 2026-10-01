@@ -1,31 +1,43 @@
-<a class="skip-link" href="#main">Skip to main content</a>
+<a class="skip-link" href="#main">{{ 'app.skipToContent' | translate }}</a>
 <header class="app-header">
-  <span class="app-title">Market Screener</span>
-  <nav class="app-nav" aria-label="Main">
+  <span class="app-title">{{ 'app.name' | translate }}</span>
+  <nav class="app-nav" [attr.aria-label]="'app.navLabel' | translate">
     <a
       routerLink="/"
       routerLinkActive="app-nav__link--active"
       ariaCurrentWhenActive="page"
       class="app-nav__link"
       [routerLinkActiveOptions]="screenerActiveOptions"
-      >Screener</a
+      >{{ 'app.navScreener' | translate }}</a
     >
     <a
       routerLink="/watchlist"
       routerLinkActive="app-nav__link--active"
       ariaCurrentWhenActive="page"
       class="app-nav__link"
-      >Watchlist</a
+      >{{ 'app.navWatchlist' | translate }}</a
     >
   </nav>
+  <label class="app-language">
+    <span class="app-language__label">{{ 'app.language' | translate }}</span>
+    <select class="app-language__select" (change)="onLanguageChange($event)">
+      @for (language of languages; track language.code) {
+        <!-- Each language is named in its own language, with a matching lang attribute. -->
+        <option
+          [value]="language.code"
+          [attr.lang]="language.code"
+          [selected]="language.code === locale.language()"
+        >
+          {{ language.nativeName }}
+        </option>
+      }
+    </select>
+  </label>
 </header>
 <!-- Always in the DOM so the message is announced when it appears. -->
 <div class="app-offline" role="status">
   @if (!network.online()) {
-    <p class="app-offline__message">
-      You're offline. Showing data saved on this device; watchlist changes will
-      be saved when you reconnect.
-    </p>
+    <p class="app-offline__message">{{ 'app.offline' | translate }}</p>
   }
 </div>
 <main id="main" class="app-main" tabindex="-1">

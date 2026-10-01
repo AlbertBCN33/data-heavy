@@ -1,0 +1,182 @@
+{
+  "app": {
+    "name": "Market Screener",
+    "skipToContent": "Saltar al contenido principal",
+    "navLabel": "Principal",
+    "navScreener": "Buscador",
+    "navWatchlist": "Favoritos",
+    "language": "Idioma",
+    "offline": "Sin conexión. Se muestran los datos guardados en este dispositivo; los cambios en favoritos se guardarán al volver a conectarte.",
+    "updateAvailable": "Hay una nueva versión de la aplicación.",
+    "reload": "Recargar"
+  },
+  "titles": {
+    "screener": "Market Screener",
+    "watchlist": "Favoritos · Market Screener"
+  },
+  "toast": {
+    "dismiss": "Cerrar",
+    "region": "Notificaciones"
+  },
+  "columns": {
+    "symbol": "Símbolo",
+    "name": "Nombre",
+    "type": "Tipo",
+    "exchange": "Bolsa",
+    "sector": "Sector",
+    "country": "País",
+    "price": "Precio",
+    "changePct": "Variación",
+    "volume": "Volumen",
+    "marketCapUsd": "Capitalización",
+    "peRatio": "PER",
+    "dividendYield": "Rent. div.",
+    "beta": "Beta",
+    "high52w": "Máx. 52 sem.",
+    "low52w": "Mín. 52 sem."
+  },
+  "types": {
+    "equity": "Acción",
+    "etf": "ETF"
+  },
+  "sectors": {
+    "Communication": "Comunicaciones",
+    "ConsumerDiscretionary": "Consumo discrecional",
+    "ConsumerStaples": "Consumo básico",
+    "Energy": "Energía",
+    "Financials": "Finanzas",
+    "HealthCare": "Salud",
+    "Industrials": "Industria",
+    "Materials": "Materiales",
+    "RealEstate": "Inmobiliario",
+    "Technology": "Tecnología",
+    "Utilities": "Servicios públicos"
+  },
+  "screener": {
+    "heading": "Buscador de mercado",
+    "count": "{{matches}} de {{total}} instrumentos",
+    "updating": "Actualizando…",
+    "results": "Resultados",
+    "gridLabel": "Instrumentos",
+    "empty": "Ningún instrumento cumple estos filtros.",
+    "clearFilters": "Borrar filtros",
+    "loadError": "No se pudieron cargar los datos de mercado.",
+    "retry": "Reintentar",
+    "ignoredSettings": "Algunos ajustes de este enlace no se reconocieron y se han ignorado.",
+    "onWatchlist": ", en favoritos",
+    "sortPriority": ", orden {{priority}}, {{direction}}",
+    "ascending": "ascendente",
+    "descending": "descendente"
+  },
+  "filters": {
+    "heading": "Filtros",
+    "active": {
+      "one": "{{count}} activo",
+      "other": "{{count}} activos"
+    },
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "landmark": "Filtrar instrumentos",
+    "search": "Buscar",
+    "searchPlaceholder": "Símbolo o nombre",
+    "any": "Cualquiera",
+    "min": "Mín.",
+    "max": "Máx.",
+    "rangeError": "Introduce números como 10, 2,5 o 2B, con el mínimo no superior al máximo."
+  },
+  "columnPicker": {
+    "button": "Columnas",
+    "title": "Columnas",
+    "hint": "Elige qué columnas mostrar y en qué orden. El símbolo siempre va primero.",
+    "moveUp": "Subir {{label}}",
+    "moveDown": "Bajar {{label}}",
+    "moved": "{{label}} movida a la posición {{position}} de {{total}}",
+    "reset": "Restablecer",
+    "cancel": "Cancelar",
+    "apply": "Aplicar",
+    "close": "Cerrar"
+  },
+  "detail": {
+    "close": "Cerrar detalles",
+    "loading": "Cargando instrumento",
+    "notFound": "Instrumento no encontrado",
+    "notFoundMessage": "Este instrumento no está disponible. Puede que el enlace esté desactualizado.",
+    "add": "Añadir a favoritos",
+    "remove": "Quitar de favoritos",
+    "stats": {
+      "price": "Precio",
+      "changeToday": "Variación hoy",
+      "marketCap": "Capitalización",
+      "volume": "Volumen",
+      "peRatio": "PER",
+      "dividendYield": "Rentabilidad por dividendo",
+      "beta": "Beta",
+      "range52w": "Rango 52 semanas",
+      "type": "Tipo",
+      "exchange": "Bolsa",
+      "country": "País",
+      "currency": "Divisa"
+    },
+    "chart": {
+      "heading": "Histórico de precios",
+      "range": "Periodo del gráfico",
+      "ranges": {
+        "1M": "1 mes",
+        "3M": "3 meses",
+        "6M": "6 meses",
+        "1Y": "1 año"
+      },
+      "error": "No se pudo cargar el histórico de precios.",
+      "retry": "Reintentar",
+      "noData": "Sin datos de precios.",
+      "up": "Sube",
+      "down": "Baja",
+      "flat": "Sin cambios",
+      "summary": "{{direction}} {{change}}, de {{start}} el {{startDate}} a {{end}} el {{endDate}}. Máximo {{high}} el {{highDate}}, mínimo {{low}} el {{lowDate}}."
+    },
+    "table": {
+      "show": "Mostrar tabla de precios",
+      "hide": "Ocultar tabla de precios",
+      "caption": "Precios de cierre diarios, del más reciente al más antiguo",
+      "date": "Fecha",
+      "close": "Cierre"
+    }
+  },
+  "watchlist": {
+    "heading": "Favoritos",
+    "caption": {
+      "one": "{{count}} instrumento en favoritos",
+      "other": "{{count}} instrumentos en favoritos"
+    },
+    "symbol": "Símbolo",
+    "name": "Nombre",
+    "price": "Precio",
+    "change": "Variación",
+    "actions": "Acciones",
+    "remove": "Quitar",
+    "removeLabel": "Quitar {{symbol}} de favoritos",
+    "empty": "No tienes favoritos.",
+    "emptyHint": "Abre un instrumento en el buscador y elige «Añadir a favoritos».",
+    "openScreener": "Ir al buscador",
+    "loadError": "No se pudieron cargar tus favoritos.",
+    "retry": "Reintentar",
+    "queued": {
+      "one": "{{count}} cambio se guardará al volver a conectarte.",
+      "other": "{{count}} cambios se guardarán al volver a conectarte."
+    }
+  },
+  "notifications": {
+    "added": "{{symbol}} añadido a favoritos.",
+    "removed": "{{symbol}} quitado de favoritos.",
+    "failedAdd": "No se pudo añadir {{symbol}}. Se ha deshecho el cambio.",
+    "failedRemove": "No se pudo quitar {{symbol}}. Se ha deshecho el cambio.",
+    "queuedAdd": "Sin conexión. {{symbol}} se añadirá a favoritos al volver a conectarte.",
+    "queuedRemove": "Sin conexión. {{symbol}} se quitará de favoritos al volver a conectarte.",
+    "synced": {
+      "one": "Conexión recuperada: se ha guardado {{count}} cambio en favoritos.",
+      "other": "Conexión recuperada: se han guardado {{count}} cambios en favoritos."
+    },
+    "undo": "Deshacer",
+    "retry": "Reintentar"
+  }
+}

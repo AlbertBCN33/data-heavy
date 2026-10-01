@@ -36,6 +36,11 @@
           {
             "glob": "**/*",
             "input": "apps/screener/public"
+          },
+          {
+            "glob": "**/*",
+            "input": "apps/screener/src/assets",
+            "output": "assets"
           }
         ],
         "styles": ["apps/screener/src/styles.scss"],
