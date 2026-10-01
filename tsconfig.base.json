@@ -15,17 +15,22 @@
     "skipDefaultLibCheck": true,
     "strict": true,
     "paths": {
-      "@data-heavy/feature-screener": [
-        "./libs/screener/feature-screener/src/index.ts"
+      "@data-heavy/data-access": ["./libs/screener/data-access/src/index.ts"],
+      "@data-heavy/data-access/providers": [
+        "./libs/screener/data-access/src/providers.ts"
       ],
       "@data-heavy/feature-detail": [
         "./libs/screener/feature-detail/src/index.ts"
       ],
+      "@data-heavy/feature-screener": [
+        "./libs/screener/feature-screener/src/index.ts"
+      ],
       "@data-heavy/feature-watchlist": [
         "./libs/screener/feature-watchlist/src/index.ts"
       ],
-      "@data-heavy/data-access": ["./libs/screener/data-access/src/index.ts"],
       "@data-heavy/ui": ["./libs/screener/ui/src/index.ts"],
+      "@data-heavy/ui/testing": ["./libs/screener/ui/src/testing.ts"],
+      "@data-heavy/ui/toast": ["./libs/screener/ui/src/toast.ts"],
       "@data-heavy/util": ["./libs/screener/util/src/index.ts"]
     },
     "noImplicitOverride": true,
