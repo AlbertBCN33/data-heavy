@@ -17,15 +17,22 @@ npm start            # http://localhost:4200
 
 ## Commands
 
-| Command                | What it does                                 |
-| ---------------------- | -------------------------------------------- |
-| `npm start`            | Dev server for the `screener` app            |
-| `npm run build`        | Production build                             |
-| `npm test`             | Unit tests (Vitest) for all projects         |
-| `npm run lint`         | ESLint, including module boundary rules      |
-| `npm run typecheck`    | `ngc`/`tsc` type checks, including templates |
-| `npm run e2e`          | Playwright journeys with axe checks          |
-| `npm run format:check` | Prettier check                               |
+| Command                 | What it does                                                       |
+| ----------------------- | ------------------------------------------------------------------ |
+| `npm start`             | Dev server for the `screener` app                                  |
+| `npm run build`         | Production build                                                   |
+| `npm test`              | Unit tests (Vitest) for all projects                               |
+| `npm run lint`          | ESLint, including module boundary rules                            |
+| `npm run typecheck`     | `ngc`/`tsc` type checks, including templates                       |
+| `npm run e2e`           | Playwright journeys with axe checks                                |
+| `npm run format:check`  | Prettier check                                                     |
+| `npm run data:generate` | Regenerate the market data snapshot (also runs before build/serve) |
+
+## Data
+
+The app runs on a **synthetic, deterministic** dataset of 10,000 equities and ETFs. Company names and
+figures are generated and do not refer to real companies. See [tools/market-data](tools/market-data/README.md)
+and [ADR 0006](docs/adr/0006-market-data-snapshot-and-adapters.md).
 
 ## Documentation
 
