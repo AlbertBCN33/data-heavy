@@ -20,13 +20,17 @@ env:
   NX_DAEMON: false
   # Avoids colour codes in logs from tools that don't detect CI.
   FORCE_COLOR: 0
+  # Browser matrix (ADR 0015): pull requests run Chromium and a mobile profile; main also runs
+  # Firefox and WebKit, where the cross-engine regressions this app has hit actually showed up.
+  E2E_ALL_BROWSERS: ${{ github.event_name == 'push' && '1' || '' }}
+  E2E_BROWSERS: ${{ github.event_name == 'push' && 'chromium firefox webkit' || 'chromium' }}
 
 jobs:
   ci:
     name: ci
     # Pinned image: Playwright system deps are distro-specific; upgrade deliberately.
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -84,15 +88,15 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}-${{ env.E2E_BROWSERS }}
 
       - name: Install Playwright browser and system dependencies
         if: steps.e2e.outputs.projects != '' && steps.pw-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps $E2E_BROWSERS
 
       - name: Install Playwright system dependencies (browser cached)
         if: steps.e2e.outputs.projects != '' && steps.pw-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: npx playwright install-deps $E2E_BROWSERS
 
       - name: E2E with axe checks (affected)
         if: steps.e2e.outputs.projects != ''
@@ -105,3 +109,24 @@ jobs:
           name: playwright-report
           path: dist/.playwright
           retention-days: 7
+
+      - name: Detect whether the app is affected
+        id: app
+        run: |
+          affected=$(npx nx show projects --affected --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(String(JSON.parse(s).includes('screener'))))")
+          echo "affected=$affected" >> "$GITHUB_OUTPUT"
+
+      # Lab check of the production build on a throttled mobile profile: fails on LCP, CLS, TBT,
+      # accessibility or script size regressions (thresholds in lighthouserc.json, ADR 0015).
+      # Uses the runner's preinstalled Google Chrome.
+      - name: Lighthouse CI
+        if: steps.app.outputs.affected == 'true'
+        run: npx lhci autorun
+
+      - name: Upload Lighthouse reports
+        if: always() && steps.app.outputs.affected == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lighthouse
+          path: dist/lighthouse
+          retention-days: 14
