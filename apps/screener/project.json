@@ -4,7 +4,7 @@
   "projectType": "application",
   "prefix": "dh",
   "sourceRoot": "apps/screener/src",
-  "tags": [],
+  "tags": ["type:app", "scope:screener"],
   "targets": {
     "build": {
       "executor": "@angular/build:application",
@@ -60,7 +60,26 @@
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint"
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/.eslintignore",
+        "{workspaceRoot}/eslint.config.mjs",
+        "{workspaceRoot}/tools/eslint-rules/**/*",
+        {
+          "externalDependencies": ["eslint"]
+        }
+      ]
+    },
+    "test": {
+      "outputs": [
+        "{projectRoot}/{options.coverage.reportsDirectory}",
+        "{workspaceRoot}/coverage/apps/screener"
+      ],
+      "options": {
+        "coverage.reportsDirectory": "../../coverage/apps/screener"
+      }
     },
     "serve-static": {
       "continuous": true,
@@ -70,6 +89,17 @@
         "port": 4200,
         "staticFilePath": "dist/apps/screener/browser",
         "spa": true
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "ngc -p tsconfig.app.json --noEmit",
+          "tsc -p tsconfig.spec.json --noEmit"
+        ],
+        "parallel": false
       }
     }
   }

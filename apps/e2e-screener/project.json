@@ -1,0 +1,19 @@
+{
+  "name": "e2e-screener",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/e2e-screener/src",
+  "implicitDependencies": ["screener"],
+  "// targets": "to see all targets run: nx show project e2e-screener --web",
+  "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": ["tsc -p tsconfig.json --noEmit"],
+        "parallel": false
+      }
+    }
+  },
+  "tags": ["type:e2e", "scope:screener"]
+}
