@@ -185,7 +185,13 @@ test.describe('offline app', () => {
   test('loads with its data from the service worker cache when offline', async ({
     page,
     context,
+    browserName,
   }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      browserName === 'webkit',
+      'Playwright WebKit does not support service workers reliably',
+    );
     await openScreener(page);
     // Wait until the service worker controls the page, then load once through it so the
     // market data is cached.
