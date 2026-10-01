@@ -1,0 +1,74 @@
+<form
+  class="dh-filters"
+  role="search"
+  aria-label="Filter instruments"
+  (submit)="$event.preventDefault()"
+>
+  <div class="dh-filters__field">
+    <label class="dh-filters__label" [for]="idPrefix + '-q'">Search</label>
+    <input
+      class="dh-filters__input"
+      type="search"
+      autocomplete="off"
+      placeholder="Symbol or name"
+      [id]="idPrefix + '-q'"
+      [value]="text()"
+      (input)="onSearchInput($any($event.target).value)"
+    />
+  </div>
+
+  @for (key of enumFilters; track key) {
+    <dh-multi-select
+      [label]="labels[key]"
+      placeholder="Any"
+      [options]="options()[key]"
+      [value]="view().selects[key] ?? []"
+      (valueChange)="onSelect(key, $event)"
+    />
+  }
+
+  @for (key of rangeFilters; track key) {
+    @let isInvalid = invalid().has(key);
+    <fieldset class="dh-filters__range">
+      <legend class="dh-filters__label">{{ labels[key] }}</legend>
+      <div class="dh-filters__range-inputs">
+        <label>
+          <span class="dh-filters__sublabel">Min</span>
+          <input
+            class="dh-filters__input"
+            inputmode="decimal"
+            autocomplete="off"
+            [value]="drafts()[key].min"
+            [attr.aria-invalid]="isInvalid || null"
+            [attr.aria-describedby]="isInvalid ? errorId(key) : null"
+            (input)="onRangeInput(key, 'min', $any($event.target).value)"
+            (change)="commitRange(key)"
+          />
+        </label>
+        <label>
+          <span class="dh-filters__sublabel">Max</span>
+          <input
+            class="dh-filters__input"
+            inputmode="decimal"
+            autocomplete="off"
+            [value]="drafts()[key].max"
+            [attr.aria-invalid]="isInvalid || null"
+            [attr.aria-describedby]="isInvalid ? errorId(key) : null"
+            (input)="onRangeInput(key, 'max', $any($event.target).value)"
+            (change)="commitRange(key)"
+          />
+        </label>
+      </div>
+      @if (isInvalid) {
+        <p class="dh-filters__error" [id]="errorId(key)">
+          Enter numbers such as 10, 2.5 or 2B, with the minimum not above the
+          maximum.
+        </p>
+      }
+    </fieldset>
+  }
+
+  <button dhButton type="button" (click)="clearAll.emit()">
+    Clear filters
+  </button>
+</form>
