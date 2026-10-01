@@ -63,7 +63,10 @@ export const COLUMNS = [
   number('low52w', 'price', false),
 ] as const satisfies readonly ColumnDef[];
 
-export type ColumnKey = (typeof COLUMNS)[number]['key'];
+/** A column from the registry, with its key narrowed to {@link ColumnKey}. */
+export type RegisteredColumn = (typeof COLUMNS)[number];
+
+export type ColumnKey = RegisteredColumn['key'];
 export type NumberColumnKey = Extract<
   (typeof COLUMNS)[number],
   { kind: 'number' }
@@ -82,9 +85,11 @@ export const DEFAULT_COLUMNS: readonly ColumnKey[] = COLUMNS.filter(
   (c) => c.defaultVisible,
 ).map((c) => c.key);
 
-const BY_KEY = new Map<string, ColumnDef>(COLUMNS.map((c) => [c.key, c]));
+const BY_KEY = new Map<string, RegisteredColumn>(
+  COLUMNS.map((c) => [c.key, c]),
+);
 
-export function getColumn(key: string): ColumnDef | undefined {
+export function getColumn(key: string): RegisteredColumn | undefined {
   return BY_KEY.get(key);
 }
 

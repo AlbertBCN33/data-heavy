@@ -16,6 +16,9 @@
   --dh-on-accent: #ffffff;
   --dh-danger: #b3261e;
   --dh-positive: #2e7d32;
+  /* Text colours for gains and losses: ≥ 4.5:1 on background and surface (WCAG 1.4.3). */
+  --dh-positive-text: #2e7d32;
+  --dh-negative-text: #b3261e;
   --dh-skeleton: rgb(20 23 28 / 9%);
   --dh-toast-bg: #1f2329;
   --dh-toast-text: #f3f4f6;
@@ -34,6 +37,8 @@
     --dh-accent-hover: #1d4ed8;
     --dh-danger: #c62828;
     --dh-positive: #43a047;
+    --dh-positive-text: #66bb6a;
+    --dh-negative-text: #ff8a80;
     --dh-skeleton: rgb(232 234 238 / 10%);
   }
 }

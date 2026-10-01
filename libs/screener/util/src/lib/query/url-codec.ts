@@ -36,8 +36,10 @@ import {
  * | `cols`           | `cols=symbol,name,price`        | Visible columns in order (symbol pinned)   |
  * | `sel`            | `sel=NASDAQ:ABC`                | Instrument open in the detail drawer       |
  *
- * Decoding never throws. Each invalid parameter is dropped on its own, reported in `issues`, and
- * the rest of the view is kept, so a hand-edited or outdated link still opens something useful.
+ * Decoding never throws. Each invalid value of a screener param is dropped on its own, reported in
+ * `issues`, and the rest of the view is kept, so a hand-edited or outdated link still opens
+ * something useful. Params the screener does not own (`utm_source`, `lang`, …) and empty values
+ * (`sel=`) are ignored silently: they are not mistakes worth telling the user about.
  */
 
 export type QueryParams = Readonly<
@@ -47,7 +49,6 @@ export type QueryParams = Readonly<
 export interface CodecIssue {
   readonly param: string;
   readonly reason:
-    | 'unknown-param'
     | 'invalid-range'
     | 'unknown-value'
     | 'unknown-column'
@@ -64,12 +65,6 @@ export interface DecodeResult {
 
 const RESERVED = new Set(['q', 'sort', 'cols', 'sel']);
 
-/**
- * Params owned by other parts of the app (language, stress mode, …). The codec ignores them
- * instead of reporting them as unknown.
- */
-const FOREIGN_PARAMS = new Set(['lang', 'rows', 'sim']);
-
 export function decodeView(params: QueryParams): DecodeResult {
   const issues: CodecIssue[] = [];
   const ranges: Partial<Record<NumberColumnKey, RangeFilter>> = {};
@@ -82,7 +77,12 @@ export function decodeView(params: QueryParams): DecodeResult {
   for (const [param, raw] of Object.entries(params)) {
     // Repeated params (`?q=a&q=b`): the last one wins, like most routers.
     const value = Array.isArray(raw) ? raw[raw.length - 1] : raw;
-    if (value === undefined || FOREIGN_PARAMS.has(param)) {
+    // `sort=` is meaningful (explicitly unsorted); any other empty value means "not set".
+    if (
+      value === undefined ||
+      !isViewParam(param) ||
+      (value.trim() === '' && param !== 'sort')
+    ) {
       continue;
     }
     if (param === 'q') {
@@ -116,8 +116,6 @@ export function decodeView(params: QueryParams): DecodeResult {
         if (values.length > 0) {
           selects[param] = values;
         }
-      } else {
-        issues.push({ param, reason: 'unknown-param' });
       }
     }
   }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ToastOutlet } from '@data-heavy/ui';
+import { ToastOutlet } from '@data-heavy/ui/toast';
 
 @Component({
   selector: 'dh-root',

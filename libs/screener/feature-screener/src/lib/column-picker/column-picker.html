@@ -1,0 +1,61 @@
+<button dhButton type="button" size="sm" (click)="openPicker()">Columns</button>
+
+<dh-dialog [(open)]="open" label="Columns" closeLabel="Close">
+  <p class="dh-columns__hint">
+    Choose which columns to show and in which order. Symbol is always first.
+  </p>
+  <ol class="dh-columns__list">
+    @for (choice of draft(); track choice.key; let i = $index, last = $last) {
+      @let label = labels[choice.key];
+      <li class="dh-columns__item">
+        <label class="dh-columns__toggle">
+          <input
+            type="checkbox"
+            [checked]="choice.visible"
+            [disabled]="choice.key === pinned"
+            (change)="toggle(choice.key)"
+          />
+          {{ label }}
+        </label>
+        @if (choice.key !== pinned) {
+          <span class="dh-columns__moves">
+            <button
+              dhButton
+              type="button"
+              size="sm"
+              variant="ghost"
+              [id]="moveId(choice.key, 'up')"
+              [disabled]="i <= 1"
+              [attr.aria-label]="'Move ' + label + ' up'"
+              (click)="move(i, -1)"
+            >
+              <span aria-hidden="true">↑</span>
+            </button>
+            <button
+              dhButton
+              type="button"
+              size="sm"
+              variant="ghost"
+              [id]="moveId(choice.key, 'down')"
+              [disabled]="last"
+              [attr.aria-label]="'Move ' + label + ' down'"
+              (click)="move(i, 1)"
+            >
+              <span aria-hidden="true">↓</span>
+            </button>
+          </span>
+        }
+      </li>
+    }
+  </ol>
+  <div dhDialogFooter class="dh-columns__footer">
+    <button dhButton type="button" variant="ghost" (click)="resetToDefault()">
+      Reset to default
+    </button>
+    <span class="dh-columns__spacer"></span>
+    <button dhButton type="button" (click)="open.set(false)">Cancel</button>
+    <button dhButton type="button" variant="primary" (click)="applyChanges()">
+      Apply
+    </button>
+  </div>
+</dh-dialog>

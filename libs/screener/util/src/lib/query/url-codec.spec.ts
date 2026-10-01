@@ -85,7 +85,6 @@ describe('url codec', () => {
       expect(issues).toEqual([
         { param: 'price', reason: 'invalid-range' },
         { param: 'sector', reason: 'unknown-value' },
-        { param: 'bogus', reason: 'unknown-param' },
         { param: 'sel', reason: 'invalid-id' },
       ]);
     });
@@ -96,10 +95,30 @@ describe('url codec', () => {
       expect(issues).toEqual([{ param: 'q', reason: 'too-long' }]);
     });
 
-    it('ignores params owned by other features', () => {
-      expect(
-        decodeView({ lang: 'es', rows: '50000', sim: '1' }).issues,
-      ).toEqual([]);
+    it('silently ignores params it does not own, such as tracking params', () => {
+      const { view, issues } = decodeView({
+        lang: 'es',
+        sim: '1',
+        utm_source: 'newsletter',
+        fbclid: 'abc',
+        bogus: '1',
+        symbol: 'ABC', // a column, but not a filter
+      });
+      expect(view).toEqual(DEFAULT_VIEW);
+      expect(issues).toEqual([]);
+    });
+
+    it('treats empty values as not set, except an explicitly empty sort', () => {
+      const { view, issues } = decodeView({
+        q: ' ',
+        price: '',
+        sector: '',
+        sel: '',
+        cols: '',
+      });
+      expect(view).toEqual(DEFAULT_VIEW);
+      expect(issues).toEqual([]);
+      expect(decodeView({ sort: '' }).view.sort).toEqual([]);
     });
 
     it('uses the last value of a repeated param', () => {
