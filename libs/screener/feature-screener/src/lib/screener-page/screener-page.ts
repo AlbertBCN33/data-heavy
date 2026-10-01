@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  DOCUMENT,
   effect,
   inject,
   signal,
@@ -12,6 +13,7 @@ import {
 import {
   LocaleState,
   provideScreenerStore,
+  QUERY_WORKER_FACTORY,
   ScreenerStore,
   WatchlistStore,
 } from '@data-heavy/data-access';
@@ -29,6 +31,7 @@ import {
 } from '@ngx-translate/core';
 
 import { ColumnPicker } from '../column-picker/column-picker';
+import { NaiveTable } from '../naive-table/naive-table';
 import { type FilterChange, FilterPanel } from '../filters/filter-panel';
 import { ScreenerTable } from '../table/screener-table';
 
@@ -37,17 +40,47 @@ export type ScreenerState = 'loading' | 'error' | 'empty' | 'ready';
 /** Delay before announcing the result count, so typing produces one announcement. */
 export const ANNOUNCE_DELAY_MS = 600;
 
+/**
+ * `?naive=1`: a performance baseline that renders every row in a plain table and filters and sorts
+ * on the main thread. Used by the measurements in docs/performance.md; not a product feature.
+ */
+export function isNaiveMode(document: Document): boolean {
+  return (
+    new URLSearchParams(document.defaultView?.location.search ?? '').get(
+      'naive',
+    ) === '1'
+  );
+}
+
 const NARROW_SCREEN = '(max-width: 64rem)';
 
 @Component({
   selector: 'dh-screener-page',
-  imports: [Button, ColumnPicker, FilterPanel, ScreenerTable, TranslatePipe],
-  providers: [provideScreenerStore()],
+  imports: [
+    Button,
+    ColumnPicker,
+    FilterPanel,
+    NaiveTable,
+    ScreenerTable,
+    TranslatePipe,
+  ],
+  providers: [
+    provideScreenerStore(),
+    // Naive mode (performance baseline): queries run on the main thread.
+    {
+      provide: QUERY_WORKER_FACTORY,
+      useFactory: () => {
+        const fallback = inject(QUERY_WORKER_FACTORY, { skipSelf: true });
+        return isNaiveMode(inject(DOCUMENT)) ? () => null : fallback;
+      },
+    },
+  ],
   templateUrl: './screener-page.html',
   styleUrl: './screener-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScreenerPage {
+  protected readonly naive = isNaiveMode(inject(DOCUMENT));
   protected readonly store = inject(ScreenerStore);
   protected readonly watchlist = inject(WatchlistStore);
   private readonly announcer = inject(LiveAnnouncer);

@@ -9,11 +9,13 @@ import {
   SimulatedLatencyAdapter,
   type SimulationOptions,
 } from './simulated-latency.adapter';
-import { StaticJsonAdapter } from './static-json.adapter';
+import { MARKET_SNAPSHOT_URL, StaticJsonAdapter } from './static-json.adapter';
 
 export interface MarketDataConfig {
   /** Wrap the default adapter with simulated latency and failures. */
   readonly simulate?: SimulationOptions | false;
+  /** Alternative snapshot file, e.g. the 50k-row stress dataset. */
+  readonly snapshotUrl?: string;
 }
 
 /**
@@ -22,6 +24,7 @@ export interface MarketDataConfig {
  * ```ts
  * provideMarketData();                                  // bundled snapshot
  * provideMarketData({ simulate: DEFAULT_SIMULATION });  // + latency and failures
+ * provideMarketData({ snapshotUrl: 'data/market-snapshot-50k.json' }); // stress test
  * ```
  */
 export function provideMarketData(
@@ -29,6 +32,9 @@ export function provideMarketData(
 ): EnvironmentProviders {
   return makeEnvironmentProviders([
     StaticJsonAdapter,
+    ...(config.snapshotUrl
+      ? [{ provide: MARKET_SNAPSHOT_URL, useValue: config.snapshotUrl }]
+      : []),
     {
       provide: MarketDataPort,
       useFactory: () => {

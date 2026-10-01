@@ -82,18 +82,30 @@
         </div>
       }
       @default {
-        <dh-screener-table
-          [label]="'screener.gridLabel' | translate"
-          [loading]="state() === 'loading'"
-          [rows]="store.rows()"
-          [columns]="store.view().columns"
-          [sort]="store.view().sort"
-          [selectedId]="store.view().selected"
-          [watchedIds]="watchlist.idSet()"
-          [locale]="locale()"
-          (sortChange)="onSortChange($event)"
-          (rowActivate)="onRowActivate($event)"
-        />
+        @if (naive) {
+          <dh-naive-table
+            [label]="'screener.gridLabel' | translate"
+            [rows]="store.rows()"
+            [columns]="store.view().columns"
+            [sort]="store.view().sort"
+            [locale]="locale()"
+            (sortChange)="onSortChange($event)"
+            (rowActivate)="onRowActivate($event)"
+          />
+        } @else {
+          <dh-screener-table
+            [label]="'screener.gridLabel' | translate"
+            [loading]="state() === 'loading'"
+            [rows]="store.rows()"
+            [columns]="store.view().columns"
+            [sort]="store.view().sort"
+            [selectedId]="store.view().selected"
+            [watchedIds]="watchlist.idSet()"
+            [locale]="locale()"
+            (sortChange)="onSortChange($event)"
+            (rowActivate)="onRowActivate($event)"
+          />
+        }
       }
     }
   </section>
