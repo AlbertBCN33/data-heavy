@@ -1,0 +1,92 @@
+.dh-dialog {
+  // The surface fills the dialog, so any click that lands on the <dialog> itself is a backdrop click.
+  padding: 0;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--dh-text, #14171c);
+  max-inline-size: min(36rem, calc(100vw - 2rem));
+  max-block-size: calc(100dvh - 2rem);
+  inline-size: 100%;
+
+  &::backdrop {
+    background: rgb(0 0 0 / 45%);
+  }
+
+  &[open] {
+    animation: dh-dialog-in 160ms ease-out;
+  }
+}
+
+.dh-dialog--drawer {
+  margin: 0 0 0 auto;
+  border-radius: 0;
+  inline-size: min(34rem, 100vw);
+  max-inline-size: 100vw;
+  block-size: 100dvh;
+  max-block-size: 100dvh;
+
+  &[open] {
+    animation-name: dh-drawer-in;
+  }
+
+  .dh-dialog__surface {
+    block-size: 100%;
+  }
+}
+
+.dh-dialog__surface {
+  display: flex;
+  flex-direction: column;
+  max-block-size: inherit;
+  background: var(--dh-bg, #fff);
+  border-radius: inherit;
+}
+
+.dh-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+  border-block-end: 1px solid var(--dh-border, #d5d9e0);
+}
+
+.dh-dialog__title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.dh-dialog__body {
+  flex: 1;
+  overflow: auto;
+  padding: 1.25rem;
+}
+
+.dh-dialog__sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes dh-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+@keyframes dh-drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dh-dialog[open] {
+    animation: none;
+  }
+}

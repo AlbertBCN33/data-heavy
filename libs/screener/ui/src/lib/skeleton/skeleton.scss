@@ -1,0 +1,41 @@
+:host {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: middle;
+  background: var(--dh-skeleton, rgb(127 127 127 / 18%));
+  border-radius: 0.25rem;
+}
+
+:host(.dh-skeleton--circle) {
+  border-radius: 50%;
+}
+
+:host(.dh-skeleton--rect) {
+  border-radius: 0.375rem;
+}
+
+.dh-skeleton__shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 25%),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: dh-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes dh-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dh-skeleton__shimmer {
+    display: none;
+  }
+}

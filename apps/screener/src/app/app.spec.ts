@@ -10,6 +10,15 @@ describe('App', () => {
     }).compileComponents();
   });
 
+  it('mounts the toast outlet with its live regions', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(
+      el.querySelector('dh-toast-outlet [aria-live="polite"]'),
+    ).not.toBeNull();
+  });
+
   it('renders a skip link that targets the main landmark', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();

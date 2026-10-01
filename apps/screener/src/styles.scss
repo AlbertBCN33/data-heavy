@@ -6,8 +6,19 @@
   --dh-surface: #f5f6f8;
   --dh-text: #14171c;
   --dh-text-muted: #545b66;
+  /* Decorative dividers only. */
   --dh-border: #d5d9e0;
+  /* Edges of interactive controls: ≥ 3:1 against the background (WCAG 1.4.11). */
+  --dh-control-border: #8a919c;
   --dh-focus: #1a5fd0;
+  --dh-accent: #1a5fd0;
+  --dh-accent-hover: #154ea9;
+  --dh-on-accent: #ffffff;
+  --dh-danger: #b3261e;
+  --dh-positive: #2e7d32;
+  --dh-skeleton: rgb(20 23 28 / 9%);
+  --dh-toast-bg: #1f2329;
+  --dh-toast-text: #f3f4f6;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,7 +28,13 @@
     --dh-text: #e8eaee;
     --dh-text-muted: #a3a9b3;
     --dh-border: #333a44;
+    --dh-control-border: #6b7380;
     --dh-focus: #7fb0ff;
+    --dh-accent: #2563eb;
+    --dh-accent-hover: #1d4ed8;
+    --dh-danger: #c62828;
+    --dh-positive: #43a047;
+    --dh-skeleton: rgb(232 234 238 / 10%);
   }
 }
 
