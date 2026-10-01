@@ -1,24 +1,27 @@
 /// <reference types='vitest' />
 import { defineConfig } from 'vite';
-import angular from '@analogjs/vite-plugin-angular';
 
+// util is framework-free TypeScript: tests run in plain Node, without the Angular compiler.
 export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../../node_modules/.vite/libs/screener/util',
-  plugins: [angular()],
   resolve: { tsconfigPaths: true },
   test: {
     name: 'util',
     watch: false,
-    passWithNoTests: true,
     globals: true,
-    environment: 'jsdom',
-    include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    setupFiles: ['src/test-setup.ts'],
+    environment: 'node',
+    include: ['src/**/*.spec.ts'],
     reporters: ['default'],
     coverage: {
+      enabled: true,
       reportsDirectory: '../../../coverage/libs/screener/util',
       provider: 'v8' as const,
+      include: ['src/lib/**/*.ts'],
+      exclude: ['src/**/*.spec.ts'],
+      reporter: ['text-summary', 'lcov'],
+      // Pure logic is the cheapest place to test thoroughly; keep it that way.
+      thresholds: { lines: 95, functions: 95, branches: 90, statements: 95 },
     },
   },
 }));
