@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Only the latest run per branch/PR matters; superseded runs are cancelled.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read # nx-set-shas reads previous workflow runs to find the last green commit on main
+
+env:
+  NX_NO_CLOUD: true
+  NX_DAEMON: false
+  # Avoids colour codes in logs from tools that don't detect CI.
+  FORCE_COLOR: 0
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # nx affected needs history to diff against the base commit
+
+      - name: Set up Node.js (version from .nvmrc, npm cache)
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Derive base and head for nx affected
+        uses: nrwl/nx-set-shas@afb73a62d26e41464e9254689e1fd6122ee683c1 # v5.0.1
+        with:
+          main-branch-name: main
+
+      # Local Nx cache persisted between runs. The key changes on every commit so the cache
+      # is always saved; restore-keys pick up the most recent cache for the same lockfile.
+      - name: Restore Nx cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .nx/cache
+          key: nx-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            nx-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+            nx-${{ runner.os }}-
+
+      - name: Format check
+        run: npx nx format:check
+
+      - name: Lint, typecheck, test, build (affected)
+        run: npx nx affected -t lint typecheck test build --parallel=3
+
+      - name: Detect affected e2e projects
+        id: e2e
+        # --json is explicit (it is also the non-TTY default) and joined to a plain string,
+        # so "no affected projects" is an empty output rather than "[]".
+        run: |
+          projects=$(npx nx show projects --affected -t e2e --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s).join(' ')))")
+          echo "projects=$projects" >> "$GITHUB_OUTPUT"
+          echo "Affected e2e projects: ${projects:-none}"
+
+      - name: Read Playwright version
+        if: steps.e2e.outputs.projects != ''
+        id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Playwright browsers
+        if: steps.e2e.outputs.projects != ''
+        id: pw-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+
+      - name: Install Playwright browser and system dependencies
+        if: steps.e2e.outputs.projects != '' && steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system dependencies (browser cached)
+        if: steps.e2e.outputs.projects != '' && steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: E2E with axe checks (affected)
+        if: steps.e2e.outputs.projects != ''
+        run: npx nx affected -t e2e
+
+      - name: Upload Playwright report
+        if: failure() && steps.e2e.outputs.projects != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report
+          path: dist/.playwright
+          retention-days: 7
