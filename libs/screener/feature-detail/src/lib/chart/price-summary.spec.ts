@@ -1,49 +1,64 @@
 import { getFormatters } from '@data-heavy/util';
 
-import { summarizePrices } from './price-summary';
+import { describePrices } from './price-summary';
 
 const en = getFormatters('en-US');
+const es = getFormatters('es-ES');
 
-describe('summarizePrices', () => {
-  it('describes direction, change and extremes', () => {
-    const text = summarizePrices(
-      [
-        { date: '2026-09-28', close: 100 },
-        { date: '2026-09-29', close: 130 },
-        { date: '2026-09-30', close: 110 },
-      ],
-      'USD',
-      en,
-    );
-    expect(text).toBe(
-      'Up +10.00%, from $100.00 on Sep 28, 2026 to $110.00 on Sep 30, 2026. ' +
-        'High $130.00 on Sep 29, 2026, low $100.00 on Sep 28, 2026.',
-    );
+describe('describePrices', () => {
+  const points = [
+    { date: '2026-09-28', close: 100 },
+    { date: '2026-09-29', close: 130 },
+    { date: '2026-09-30', close: 110 },
+  ];
+
+  it('describes direction, change and extremes as formatted values', () => {
+    expect(describePrices(points, 'USD', en)).toEqual({
+      direction: 'up',
+      params: {
+        change: '+10.00%',
+        start: '$100.00',
+        startDate: 'Sep 28, 2026',
+        end: '$110.00',
+        endDate: 'Sep 30, 2026',
+        high: '$130.00',
+        highDate: 'Sep 29, 2026',
+        low: '$100.00',
+        lowDate: 'Sep 28, 2026',
+      },
+    });
   });
 
-  it('describes falling and flat series', () => {
-    const down = summarizePrices(
-      [
-        { date: '2026-09-29', close: 200 },
-        { date: '2026-09-30', close: 150 },
-      ],
-      'EUR',
-      en,
-    );
-    expect(down.startsWith('Down -25.00%')).toBe(true);
-
-    const flat = summarizePrices(
-      [
-        { date: '2026-09-29', close: 0 },
-        { date: '2026-09-30', close: 0 },
-      ],
-      'JPY',
-      en,
-    );
-    expect(flat.startsWith('Unchanged 0.00%')).toBe(true);
+  it('formats for the given locale', () => {
+    const summary = describePrices(points, 'EUR', es);
+    expect(summary?.params.startDate).toBe('28 sept 2026');
+    expect(summary?.params.change.replace(/\s/g, ' ')).toBe('+10,00 %');
   });
 
-  it('handles an empty series', () => {
-    expect(summarizePrices([], 'USD', en)).toBe('No price data.');
+  it('classifies falling and flat series', () => {
+    expect(
+      describePrices(
+        [
+          { date: '2026-09-29', close: 200 },
+          { date: '2026-09-30', close: 150 },
+        ],
+        'EUR',
+        en,
+      )?.direction,
+    ).toBe('down');
+    expect(
+      describePrices(
+        [
+          { date: '2026-09-29', close: 0 },
+          { date: '2026-09-30', close: 0 },
+        ],
+        'JPY',
+        en,
+      )?.direction,
+    ).toBe('flat');
+  });
+
+  it('returns null for an empty series', () => {
+    expect(describePrices([], 'USD', en)).toBeNull();
   });
 });

@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import {
   isMarketDataError,
+  LocaleState,
   MarketDataPort,
   MarketDataStore,
   ScreenerUrlState,
@@ -15,19 +16,21 @@ import {
 } from '@data-heavy/data-access';
 import { Button, Dialog, Skeleton } from '@data-heavy/ui';
 import { getFormatters, type Instrument } from '@data-heavy/util';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { PriceChart } from '../chart/price-chart';
 
 export const CHART_RANGES = [
-  { id: '1M', label: '1 month', tradingDays: 21 },
-  { id: '3M', label: '3 months', tradingDays: 63 },
-  { id: '6M', label: '6 months', tradingDays: 126 },
-  { id: '1Y', label: '1 year', tradingDays: 252 },
+  { id: '1M', tradingDays: 21 },
+  { id: '3M', tradingDays: 63 },
+  { id: '6M', tradingDays: 126 },
+  { id: '1Y', tradingDays: 252 },
 ] as const;
 
 export type ChartRangeId = (typeof CHART_RANGES)[number]['id'];
 
 interface Stat {
+  /** Translation key. */
   readonly label: string;
   readonly value: string;
 }
@@ -41,7 +44,7 @@ interface Stat {
  */
 @Component({
   selector: 'dh-instrument-drawer',
-  imports: [Button, Dialog, PriceChart, Skeleton],
+  imports: [Button, Dialog, PriceChart, Skeleton, TranslatePipe],
   templateUrl: './instrument-drawer.html',
   styleUrl: './instrument-drawer.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,7 +55,8 @@ export class InstrumentDrawer {
   private readonly port = inject(MarketDataPort);
   protected readonly watchlist = inject(WatchlistStore);
 
-  protected readonly locale = 'en-US';
+  private readonly translate = inject(TranslateService);
+  protected readonly locale = inject(LocaleState).locale;
   protected readonly ranges = CHART_RANGES;
   protected readonly range = signal<ChartRangeId>('1Y');
   protected readonly showTable = signal(false);
@@ -73,7 +77,10 @@ export class InstrumentDrawer {
     if (i) {
       return `${i.symbol} · ${i.name}`;
     }
-    return this.notFound() ? 'Instrument not found' : 'Loading instrument';
+    this.translate.currentLang();
+    return this.translate.instant(
+      this.notFound() ? 'detail.notFound' : 'detail.loading',
+    ) as string;
   });
 
   protected readonly history = resource({
@@ -93,29 +100,44 @@ export class InstrumentDrawer {
     return !isMarketDataError(error) || error.retryable;
   });
 
+  /** Labels are translation keys; values are formatted for the current locale. */
   protected readonly stats = computed<readonly Stat[]>(() => {
     const i = this.instrument();
     if (!i) {
       return [];
     }
-    const f = getFormatters(this.locale);
-    const regions = new Intl.DisplayNames([this.locale], { type: 'region' });
+    const locale = this.locale();
+    const f = getFormatters(locale);
+    const regions = new Intl.DisplayNames([locale], { type: 'region' });
+    this.translate.currentLang();
     return [
-      { label: 'Price', value: f.price(i.price, i.currency) },
-      { label: 'Change today', value: f.signedPercent(i.changePct) },
-      { label: 'Market cap', value: f.compactUsd(i.marketCapUsd) },
-      { label: 'Volume', value: f.compact(i.volume) },
-      { label: 'P/E ratio', value: f.ratio(i.peRatio) },
-      { label: 'Dividend yield', value: f.percent(i.dividendYield) },
-      { label: 'Beta', value: f.ratio(i.beta) },
+      { label: 'detail.stats.price', value: f.price(i.price, i.currency) },
       {
-        label: '52-week range',
+        label: 'detail.stats.changeToday',
+        value: f.signedPercent(i.changePct),
+      },
+      { label: 'detail.stats.marketCap', value: f.compactUsd(i.marketCapUsd) },
+      { label: 'detail.stats.volume', value: f.compact(i.volume) },
+      { label: 'detail.stats.peRatio', value: f.ratio(i.peRatio) },
+      {
+        label: 'detail.stats.dividendYield',
+        value: f.percent(i.dividendYield),
+      },
+      { label: 'detail.stats.beta', value: f.ratio(i.beta) },
+      {
+        label: 'detail.stats.range52w',
         value: `${f.price(i.low52w, i.currency)} – ${f.price(i.high52w, i.currency)}`,
       },
-      { label: 'Type', value: i.type === 'etf' ? 'ETF' : 'Equity' },
-      { label: 'Exchange', value: i.exchange },
-      { label: 'Country', value: regions.of(i.country) ?? i.country },
-      { label: 'Currency', value: i.currency },
+      {
+        label: 'detail.stats.type',
+        value: this.translate.instant(`types.${i.type}`) as string,
+      },
+      { label: 'detail.stats.exchange', value: i.exchange },
+      {
+        label: 'detail.stats.country',
+        value: regions.of(i.country) ?? i.country,
+      },
+      { label: 'detail.stats.currency', value: i.currency },
     ];
   });
 
@@ -125,7 +147,7 @@ export class InstrumentDrawer {
     if (!i) {
       return [];
     }
-    const f = getFormatters(this.locale);
+    const f = getFormatters(this.locale());
     // Most recent first: the question is usually "what happened lately".
     return [...points].reverse().map((p) => ({
       date: f.date(p.date),

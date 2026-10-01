@@ -1,6 +1,6 @@
 <dh-dialog
   variant="drawer"
-  closeLabel="Close details"
+  [closeLabel]="'detail.close' | translate"
   [label]="title()"
   [open]="open()"
   (openChange)="onOpenChange($event)"
@@ -16,14 +16,14 @@
         (click)="watchlist.toggle(i.id)"
       >
         <span aria-hidden="true">{{ watched() ? '★' : '☆' }}</span>
-        {{ watched() ? 'Remove from watchlist' : 'Add to watchlist' }}
+        {{ (watched() ? 'detail.remove' : 'detail.add') | translate }}
       </button>
     </div>
 
     <dl class="dh-detail__stats">
       @for (stat of stats(); track stat.label) {
         <div class="dh-detail__stat">
-          <dt>{{ stat.label }}</dt>
+          <dt>{{ stat.label | translate }}</dt>
           <dd>{{ stat.value }}</dd>
         </div>
       }
@@ -32,10 +32,12 @@
     <section class="dh-detail__chart" aria-labelledby="dh-detail-chart-heading">
       <div class="dh-detail__chart-head">
         <h3 id="dh-detail-chart-heading" class="dh-detail__heading">
-          Price history
+          {{ 'detail.chart.heading' | translate }}
         </h3>
         <fieldset class="dh-detail__ranges">
-          <legend class="dh-sr-only">Chart range</legend>
+          <legend class="dh-sr-only">
+            {{ 'detail.chart.range' | translate }}
+          </legend>
           @for (r of ranges; track r.id) {
             <label class="dh-detail__range">
               <input
@@ -46,7 +48,9 @@
                 (change)="selectRange(r.id)"
               />
               <span aria-hidden="true">{{ r.id }}</span>
-              <span class="dh-sr-only">{{ r.label }}</span>
+              <span class="dh-sr-only">{{
+                'detail.chart.ranges.' + r.id | translate
+              }}</span>
             </label>
           }
         </fieldset>
@@ -55,7 +59,7 @@
       <div [attr.aria-busy]="history.isLoading()">
         @if (history.error()) {
           <div class="dh-detail__message" role="alert">
-            <p>Price history could not be loaded.</p>
+            <p>{{ 'detail.chart.error' | translate }}</p>
             @if (historyRetryable()) {
               <button
                 dhButton
@@ -63,7 +67,7 @@
                 size="sm"
                 (click)="history.reload()"
               >
-                Try again
+                {{ 'detail.chart.retry' | translate }}
               </button>
             }
           </div>
@@ -71,7 +75,7 @@
           <dh-price-chart
             [points]="history.value()"
             [currency]="i.currency"
-            [locale]="locale"
+            [locale]="locale()"
           />
         } @else {
           <dh-skeleton shape="rect" height="13.75rem" />
@@ -92,18 +96,22 @@
         [disabled]="!history.hasValue()"
         (click)="showTable.set(!showTable())"
       >
-        {{ showTable() ? 'Hide price table' : 'Show price table' }}
+        {{
+          (showTable() ? 'detail.table.hide' : 'detail.table.show') | translate
+        }}
       </button>
       <div id="dh-detail-table" [hidden]="!showTable()">
         @if (showTable()) {
           <table class="dh-detail__table">
             <caption>
-              Daily closing prices, most recent first
+              {{
+                'detail.table.caption' | translate
+              }}
             </caption>
             <thead>
               <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Close</th>
+                <th scope="col">{{ 'detail.table.date' | translate }}</th>
+                <th scope="col">{{ 'detail.table.close' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -120,7 +128,7 @@
     </section>
   } @else if (notFound()) {
     <div class="dh-detail__message">
-      <p>This instrument is not available. The link may be outdated.</p>
+      <p>{{ 'detail.notFoundMessage' | translate }}</p>
     </div>
   } @else {
     <div class="dh-detail__stats" aria-busy="true">

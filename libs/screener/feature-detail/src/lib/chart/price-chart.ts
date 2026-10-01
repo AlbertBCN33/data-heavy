@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
   signal,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import {
   type Currency,
   getFormatters,
@@ -12,7 +14,7 @@ import {
 } from '@data-heavy/util';
 
 import { buildChart, nearestIndex } from './chart-geometry';
-import { summarizePrices } from './price-summary';
+import { describePrices } from './price-summary';
 
 /** viewBox size; the SVG stretches to its container with a fixed CSS height. */
 const VIEW = { width: 600, height: 220, padding: 12 } as const;
@@ -44,9 +46,24 @@ export class PriceChart {
     return !g || g.last.close >= g.first.close ? 'up' : 'down';
   });
 
-  protected readonly summary = computed(() =>
-    summarizePrices(this.points(), this.currency(), this.format()),
-  );
+  private readonly translate = inject(TranslateService);
+
+  /** Translated one-sentence text alternative for the chart. */
+  protected readonly summary = computed(() => {
+    this.translate.currentLang(); // re-translate on a language switch
+    const summary = describePrices(
+      this.points(),
+      this.currency(),
+      this.format(),
+    );
+    if (!summary) {
+      return this.translate.instant('detail.chart.noData') as string;
+    }
+    return this.translate.instant('detail.chart.summary', {
+      ...summary.params,
+      direction: this.translate.instant(`detail.chart.${summary.direction}`),
+    }) as string;
+  });
 
   protected readonly labels = computed(() => {
     const g = this.geometry();
