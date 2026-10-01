@@ -1,0 +1,60 @@
+<figure class="dh-chart" [class.dh-chart--down]="trend() === 'down'">
+  @if (geometry(); as g) {
+    <div
+      class="dh-chart__plot"
+      (pointermove)="onPointerMove($event)"
+      (pointerleave)="onPointerLeave()"
+    >
+      <svg
+        class="dh-chart__svg"
+        aria-hidden="true"
+        focusable="false"
+        preserveAspectRatio="none"
+        [attr.viewBox]="'0 0 ' + view.width + ' ' + view.height"
+      >
+        <path class="dh-chart__area" [attr.d]="g.area" />
+        <path class="dh-chart__line" [attr.d]="g.line" />
+        @if (hover(); as h) {
+          <line
+            class="dh-chart__crosshair"
+            [attr.x1]="h.x"
+            [attr.x2]="h.x"
+            y1="0"
+            [attr.y2]="view.height"
+          />
+          <circle class="dh-chart__dot" [attr.cx]="h.x" [attr.cy]="h.y" r="4" />
+        }
+      </svg>
+      @if (labels(); as l) {
+        <span
+          class="dh-chart__label dh-chart__label--high"
+          aria-hidden="true"
+          >{{ l.high }}</span
+        >
+        <span class="dh-chart__label dh-chart__label--low" aria-hidden="true">{{
+          l.low
+        }}</span>
+      }
+      @if (hover(); as h) {
+        <div
+          class="dh-chart__tooltip"
+          aria-hidden="true"
+          [style.left.%]="h.percent"
+          [class.dh-chart__tooltip--end]="h.percent > 70"
+        >
+          <span>{{ h.date }}</span>
+          <strong>{{ h.price }}</strong>
+        </div>
+      }
+    </div>
+    @if (labels(); as l) {
+      <div class="dh-chart__axis" aria-hidden="true">
+        <span>{{ l.start }}</span>
+        <span>{{ l.end }}</span>
+      </div>
+    }
+  } @else {
+    <div class="dh-chart__plot dh-chart__plot--empty"></div>
+  }
+  <figcaption class="dh-chart__caption">{{ summary() }}</figcaption>
+</figure>
