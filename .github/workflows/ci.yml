@@ -151,7 +151,9 @@ jobs:
   deploy:
     name: deploy
     needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.ci.outputs.app-affected == 'true'
+    # Opt-in: skipped until the repository variable DEPLOY_ENABLED is "true", so main stays green
+    # until the one-time setup in docs/deployment.md is done.
+    if: vars.DEPLOY_ENABLED == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.ci.outputs.app-affected == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment:
@@ -193,12 +195,12 @@ jobs:
           name: app
           path: dist/apps/screener/browser
 
-      - name: Write service account credentials
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: |
-          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/service-account.json"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/service-account.json" >> "$GITHUB_ENV"
+      # Service account with the Firebase Hosting Admin role. Exports GOOGLE_APPLICATION_CREDENTIALS,
+      # which the Firebase CLI picks up.
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
       - name: Deploy to the staging preview channel
         id: staging

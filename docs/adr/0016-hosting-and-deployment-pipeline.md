@@ -30,7 +30,9 @@ previous release is one click away in the Firebase console (Hosting → release 
 Rollback). Rollback is not automated: a failure after a successful staging run points to the
 hosting platform, not to the build, and needs a human anyway.
 
-The job runs in the `production` GitHub environment. That is the only place where the
+The job is opt-in: it is skipped until the repository variable `DEPLOY_ENABLED` is `true`, so `main`
+stays green before the Firebase setup exists. It authenticates with `google-github-actions/auth`,
+as the other portfolio repositories do. The job runs in the `production` GitHub environment. That is the only place where the
 service account key exists, and the environment only accepts `main`. Deploys are serialized and
 never cancelled. On `main`, workflow runs queue instead of cancelling each other.
 

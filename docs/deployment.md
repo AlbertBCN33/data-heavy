@@ -107,6 +107,9 @@ The secret lives in a **GitHub environment**, not at repository level. Only jobs
    | `FIREBASE_PROJECT_ID` | Your project ID (not secret) |
 
 5. Delete the downloaded JSON key file from your machine.
+6. **Turn on continuous deployment.** _Settings → Secrets and variables → Actions → Variables →
+   New repository variable_: **`DEPLOY_ENABLED`** = `true`. Until then the `deploy` job is skipped,
+   so `main` stays green while the setup is incomplete. Set it last, once the steps above are done.
 
 ### 5. Local environment
 
