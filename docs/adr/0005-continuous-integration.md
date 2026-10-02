@@ -18,8 +18,8 @@ to `main`:
 2. `nx affected -t lint typecheck test build`. Only projects touched by the change, and their
    dependents, are checked. `nrwl/nx-set-shas` uses the last _successful_ run on `main` as the base,
    so a red `main` does not hide breakage.
-3. `nx affected -t e2e` against the **production build** served statically, with axe checks
-   inside the specs. Playwright browsers are only installed when an e2e project is affected.
+3. `nx affected -t e2e` against the **production build** served by the Firebase Hosting
+   emulator ([ADR 0016](0016-hosting-and-deployment-pipeline.md)), with axe checks inside the specs. Playwright browsers are only installed when an e2e project is affected.
 4. Lighthouse CI on the production build when the app is affected. The browser matrix (Chromium and
    a mobile profile on pull requests, plus Firefox and WebKit on `main`) and the Lighthouse thresholds
    are in [ADR 0015](0015-performance-budgets-and-quality-gates.md).

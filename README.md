@@ -27,6 +27,7 @@ npm start            # http://localhost:4200
 | `npm run e2e`           | Playwright journeys with axe checks                                |
 | `npm run format:check`  | Prettier check                                                     |
 | `npm run data:generate` | Regenerate the market data snapshot (also runs before build/serve) |
+| `npm run serve:hosting` | Production build served by the Firebase Hosting emulator           |
 | `npm run lighthouse`    | Lighthouse CI against the production build (build first)           |
 | `npm run perf:measure`  | Before/after performance measurements (build first)                |
 
@@ -44,4 +45,4 @@ implementation (every row in the DOM, filtering and sorting on the main thread).
 
 - [Architecture decision records](docs/adr/README.md)
 - [Performance: targets, measurements and budgets](docs/performance.md)
-- [Deployment](docs/deployment.md)
+- [Deployment: pipeline, rollback and one-time setup](docs/deployment.md)

@@ -20,3 +20,4 @@ One decision per file. Superseded ADRs are kept and marked, never rewritten.
 | [0013](0013-optimistic-watchlist-and-offline-support.md) | Optimistic watchlist and offline support              | Accepted |
 | [0014](0014-runtime-i18n-with-ngx-translate.md)          | Runtime i18n with @ngx-translate                      | Accepted |
 | [0015](0015-performance-budgets-and-quality-gates.md)    | Performance budgets, quality gates and browser matrix | Accepted |
+| [0016](0016-hosting-and-deployment-pipeline.md)          | Hosting and deployment pipeline                       | Accepted |

@@ -1,8 +1,9 @@
 # Deployment
 
 The app is a static SPA (see [ADR 0003](adr/0003-client-side-rendering.md)) served by
-**Firebase Hosting on the free Spark plan**. GitHub Actions deploys it on every push to `main`,
-after CI has passed.
+**Firebase Hosting on the free Spark plan**. GitHub Actions deploys it on every push to `main`
+that changes the app, after CI has passed. Decisions are in
+[ADR 0016](adr/0016-hosting-and-deployment-pipeline.md).
 
 - [One-time setup](#one-time-setup)
   - [1. GitHub repository](#1-github-repository)
@@ -10,6 +11,9 @@ after CI has passed.
   - [3. CI credentials (service account)](#3-ci-credentials-service-account)
   - [4. GitHub environment and secret](#4-github-environment-and-secret)
   - [5. Local environment](#5-local-environment)
+- [How a deploy works](#how-a-deploy-works)
+- [Rolling back](#rolling-back)
+- [Running the hosting setup locally](#running-the-hosting-setup-locally)
 - [Secrets policy](#secrets-policy)
 
 ## One-time setup
@@ -36,7 +40,7 @@ after CI has passed.
 5. **Settings → Branches → Add branch ruleset** for `main` (do this once CI has run at least once,
    so the check names exist):
    - Require a pull request before merging.
-   - Require status checks to pass: the `ci` job (and `lighthouse` once it exists).
+   - Require status checks to pass: the `ci` job (it includes Lighthouse CI).
    - Block force pushes.
 
 ### 2. Firebase project
@@ -50,14 +54,15 @@ after CI has passed.
 4. Stay on the **Spark (free) plan**. Do not upgrade: Hosting, including
    [preview channels](https://firebase.google.com/docs/hosting/test-preview-deploy), works on Spark.
    Check the current Hosting quotas at <https://firebase.google.com/pricing>.
-5. In the project, go to **Build → Hosting → Get started** and click through the wizard. The CLI
-   steps it shows are already handled by this repository (`firebase.json`, `.firebaserc`).
-6. Optional: confirm the CLI can see the project from your machine:
+5. In the project, go to **Build → Hosting → Get started** and click through the wizard. Skip the
+   CLI steps it shows: this repository already has `firebase.json`, and the project ID is passed
+   explicitly, so there is no `.firebaserc`.
+6. Optional: confirm the CLI can see the project from your machine (`firebase-tools` is a dev
+   dependency, so no global install is needed):
 
    ```sh
-   npm install -g firebase-tools   # skip if `firebase --version` already works
-   firebase login
-   firebase projects:list          # the new project ID should appear
+   npx firebase login
+   npx firebase projects:list      # the new project ID should appear
    ```
 
 ### 3. CI credentials (service account)
@@ -71,9 +76,8 @@ credentials are never used.
 2. **Create service account**
    - Name: `github-deployer`
    - Role: **Firebase Hosting Admin** (`roles/firebasehosting.admin`)
-   - If the deploy action later fails with a permission error about API keys, also add
-     **API Keys Viewer** (`roles/serviceusage.apiKeysViewer`). The exact role set is verified
-     during the first deploy and recorded here.
+   - If the first deploy fails with a permission error, the log names the missing permission.
+     Add the narrowest role that grants it, and record it here.
 3. Open the service account → **Keys → Add key → Create new key → JSON**. A file downloads.
 4. Treat that file like a password. Do not move it into the repository folder. You will paste its
    contents into GitHub in the next step and can delete the file afterwards.
@@ -111,6 +115,44 @@ Only needed if you want to run a manual deploy or the Firebase emulator locally.
 ```sh
 cp .env.example .env    # .env is git-ignored
 # set FIREBASE_PROJECT_ID=<your project id>
+```
+
+## How a deploy works
+
+The `deploy` job runs after the `ci` job on pushes to `main` that change the app:
+
+1. Downloads the production build that `ci` tested (no rebuild).
+2. Deploys it to the `staging` preview channel (`https://<project-id>--staging-<hash>.web.app`,
+   expires after 7 days) and runs the `@smoke` e2e tests against it: deep link, headers and CSP,
+   a journey through the grid, the worker, the drawer and Spanish.
+3. Promotes the same version to live (`firebase hosting:clone <project-id>:staging <project-id>:live`).
+4. Checks that `https://<project-id>.web.app/` serves this build's `index.html`, then runs the smoke
+   tests against live.
+
+A failure in step 2 leaves live untouched. Docs-only changes don't deploy.
+
+## Rolling back
+
+Firebase Console → **Hosting** → release history → **⋮** on the previous release → **Rollback**.
+Rollback is instant and needs no CI. Then fix forward with a new pull request, or revert the
+merge on `main`; the revert deploys through the normal pipeline.
+
+## Running the hosting setup locally
+
+```sh
+npx nx run screener:serve-static   # production build served by the Firebase Hosting emulator on :4200
+CI=true npx nx e2e e2e-screener    # e2e against it, as CI does
+```
+
+The emulator applies `firebase.json` (rewrites, headers) on Linux and macOS. On Windows it ignores
+custom headers because of a path-separator issue, so header checks only run where
+`E2E_HOSTING_HEADERS` is set (CI and the deploy smoke tests).
+
+A manual deploy should not be needed. If it is, use the same commands as the workflow:
+
+```sh
+npx firebase login
+npx firebase hosting:channel:deploy staging --no-authorized-domains --project "$FIREBASE_PROJECT_ID"
 ```
 
 ## Secrets policy
