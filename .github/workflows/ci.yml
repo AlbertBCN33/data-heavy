@@ -6,10 +6,11 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Only the latest run per branch/PR matters; superseded runs are cancelled.
+# On pull requests only the latest run matters, so superseded runs are cancelled. On main, runs
+# queue instead: cancelling one could stop a deploy halfway.
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -31,6 +32,8 @@ jobs:
     # Pinned image: Playwright system deps are distro-specific; upgrade deliberately.
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    outputs:
+      app-affected: ${{ steps.app.outputs.affected }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -98,9 +101,12 @@ jobs:
         if: steps.e2e.outputs.projects != '' && steps.pw-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps $E2E_BROWSERS
 
+      # Served by the Firebase Hosting emulator, so rewrites, headers and the CSP are tested too.
       - name: E2E with axe checks (affected)
         if: steps.e2e.outputs.projects != ''
         run: npx nx affected -t e2e
+        env:
+          E2E_HOSTING_HEADERS: 1
 
       - name: Upload Playwright report
         if: failure() && steps.e2e.outputs.projects != ''
@@ -130,3 +136,132 @@ jobs:
           name: lighthouse
           path: dist/lighthouse
           retention-days: 14
+
+      # The exact build that passed the checks above is what gets deployed.
+      - name: Upload the app build for deployment
+        if: github.event_name == 'push' && steps.app.outputs.affected == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: app
+          path: dist/apps/screener/browser
+          retention-days: 7
+
+  # Deploys to a preview channel, smoke-tests it, then promotes that same version to live and
+  # checks live. See docs/deployment.md and ADR 0016.
+  deploy:
+    name: deploy
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.ci.outputs.app-affected == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://${{ vars.FIREBASE_PROJECT_ID }}.web.app
+    # One deploy at a time, never cancelled midway.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    env:
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+    steps:
+      - name: Check deployment configuration
+        env:
+          HAS_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+        run: |
+          if [ -z "$FIREBASE_PROJECT_ID" ] || [ "$HAS_KEY" != "true" ]; then
+            echo "::error::The production environment needs the FIREBASE_PROJECT_ID variable and the FIREBASE_SERVICE_ACCOUNT secret (docs/deployment.md)."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js (version from .nvmrc, npm cache)
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download the app build
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: app
+          path: dist/apps/screener/browser
+
+      - name: Write service account credentials
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/service-account.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/service-account.json" >> "$GITHUB_ENV"
+
+      - name: Deploy to the staging preview channel
+        id: staging
+        run: |
+          npx firebase hosting:channel:deploy staging --expires 7d --no-authorized-domains --project "$FIREBASE_PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/channel.json"
+          url=$(node -e "const r=require(process.argv[1]).result;process.stdout.write(Object.values(r)[0].url)" "$RUNNER_TEMP/channel.json")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Staging: $url"
+
+      - name: Read Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Playwright browsers
+        id: pw-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}-chromium
+
+      - name: Install Chromium and system dependencies
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install system dependencies (browser cached)
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Smoke test staging
+        run: npx playwright test -c apps/screener/e2e/playwright.config.mts --project=chromium --grep @smoke
+        env:
+          BASE_URL: ${{ steps.staging.outputs.url }}
+          E2E_HOSTING_HEADERS: 1
+
+      - name: Promote staging to live
+        run: |
+          npx firebase hosting:clone "$FIREBASE_PROJECT_ID:staging" "$FIREBASE_PROJECT_ID:live" --project "$FIREBASE_PROJECT_ID" --non-interactive
+
+      # Live must serve this build (not a stale or cached one) and pass the same smoke tests.
+      - name: Check that live serves this build
+        run: |
+          url="https://$FIREBASE_PROJECT_ID.web.app/"
+          for attempt in 1 2 3 4 5 6; do
+            if curl -fsS "$url" | cmp -s - dist/apps/screener/browser/index.html; then
+              echo "Live serves this build."
+              exit 0
+            fi
+            echo "Live does not serve this build yet (attempt $attempt); retrying in 10 s."
+            sleep 10
+          done
+          echo "::error::$url does not serve the build that was deployed."
+          exit 1
+
+      - name: Smoke test live
+        run: npx playwright test -c apps/screener/e2e/playwright.config.mts --project=chromium --grep @smoke
+        env:
+          BASE_URL: https://${{ vars.FIREBASE_PROJECT_ID }}.web.app
+          E2E_HOSTING_HEADERS: 1
+
+      - name: Upload smoke test report
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: smoke-report
+          path: dist/.playwright
+          retention-days: 7
