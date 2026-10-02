@@ -17,6 +17,7 @@
     "format": "nx format:write --all",
     "format:check": "nx format:check --all",
     "data:generate": "nx run screener:market-data",
+    "serve:hosting": "nx run screener:serve-static",
     "lighthouse": "lhci autorun",
     "perf:measure": "node tools/perf/measure.mjs"
   },
@@ -67,6 +68,7 @@
     "eslint": "9.39.5",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-playwright": "1.8.3",
+    "firebase-tools": "15.32.1",
     "jsdom": "27.4.0",
     "nx": "23.2.1",
     "prettier": "3.6.2",

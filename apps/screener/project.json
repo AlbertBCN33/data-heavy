@@ -117,12 +117,10 @@
     },
     "serve-static": {
       "continuous": true,
-      "executor": "@nx/web:file-server",
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
       "options": {
-        "buildTarget": "screener:build",
-        "port": 4200,
-        "staticFilePath": "dist/apps/screener/browser",
-        "spa": true
+        "command": "firebase emulators:start --only hosting --project demo-data-heavy"
       }
     },
     "typecheck": {
