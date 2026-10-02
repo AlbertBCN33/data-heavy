@@ -63,3 +63,7 @@ vitest.config.*.timestamp*
 
 # Lighthouse CI working directory
 .lighthouseci
+
+# Firebase CLI
+.firebase
+firebase-debug.log
